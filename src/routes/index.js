@@ -4,6 +4,7 @@ const employerRouter = require('./routers/employer')
 const packageRouter = require('./routers/package');
 const categoryRouter = require('./routers/category');
 const skillRouter = require('./routers/skill');
+const checkoutRouter = require('./routers/checkout');
 
 const route = (app) => {
     app.use('/api/v1/freelancer', freelancerRouter)
@@ -12,6 +13,7 @@ const route = (app) => {
     app.use('/api/v1/packages', packageRouter);
     app.use('/api/v1/categories', categoryRouter);
     app.use('/api/v1/skills', skillRouter);
+    app.use('/api/v1/checkout', checkoutRouter);
 }
 
 module.exports = route
