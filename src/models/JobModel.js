@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { JOB_STATUS } = require('../config/constants');
+const { JOB_STATUS } = require('../constants/constants');
 const Schema = mongoose.Schema;
 
 const { toJSON } = require('./plugins');

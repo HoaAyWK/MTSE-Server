@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { ROLES } = require('../config/constants');
+const { ROLES } = require('../constants/constants');
 
 const { toJSON } = require('./plugins');
 
