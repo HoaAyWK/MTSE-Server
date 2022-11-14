@@ -1,25 +1,112 @@
 const ApiError = require('../utils/ApiError');
-const { packageService, accountService } = require('../services');
-const transactionHistoryService = require('../services/transactionHistoryService');
+const { skillService, userSkillService, accountService } = require('../services');
 const { ROLES } = require('../constants/constants');
 
-class PackageController {
-    async getPackages(req, res, next) {
+class SkillController {
+    async getSkills(req, res, next) {
         try {
             const num = req.query.num;
-            const packages = await packageService.getPackages(num);
+            const skills = await skillService.getSkills(num);
 
             res.status(200).json({
                 success: true,
-                count: packages.length,
-                packages
+                count: skills.length,
+                skills
             });
         } catch (error) {
             next(error);
         }
     }
 
-    async getPackage(req, res, next) {
+    async getSkill(res, req, next) {
+        try {
+            const id = req.params.id;
+
+            if (!id) {
+                throw new ApiError(400, 'Params must have id');
+            }
+            
+            const skill = await skillService.getSkillById(id);
+
+            if (!skill) {
+                throw new ApiError(404, 'Skill not found');
+            }
+
+            res.status(200).json({
+                success: true,
+                skill
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async createSkill(req, res, next) {
+        try {
+            const userId = req.userId;
+
+            const account = await accountService.getAccountByUserId(userId);
+
+            if (!account) {
+                throw new ApiError(404, 'Account not found');
+            }
+
+            if (account.role !== ROLES.ADMIN) {
+                throw new ApiError(403, "You don't have permission to access this resource");
+            }
+
+            const skill = await skillService.createSkill(req.body);
+
+            res.status(201).json({
+                success: true,
+                skill
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async updateSkill(req, res, next) {
+        try {
+            const userId = req.userId;
+
+            const account = await accountService.getAccountByUserId(userId);
+
+            if (!account) {
+                throw new ApiError(404, 'Account not found');
+            }
+
+            if (account.role !== ROLES.ADMIN) {
+                throw new ApiError(403, "You don't have permission to access this resource");
+            }
+
+            const id = req.params.id;
+
+            if (!id) {
+                throw new ApiError(400, 'Params must have id');
+            }
+
+            const numOfUserSkill = await userSkillService.countUserSkillsBySkill(id);
+
+            if (numOfUserSkill > 0) {
+                throw new ApiError(400, 'Another UserSkill already references this skill');
+            }
+
+            const skill = await skillService.updateSkill(id, req.body);
+
+            res.status(200).json({
+                success: true,
+                skill
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async deleteSkill(req, res, next) {
         try {
             const id = req.params.id;
 
@@ -27,113 +114,23 @@ class PackageController {
                 throw new ApiError(400, 'Params must have id');
             }
 
-            const pkg = await packageService.getPackage(id);
+            const numOfUserSkill = await userSkillService.countUserSkillsBySkill(id);
+
+            if (numOfUserSkill > 0) {
+                throw new ApiError(400, 'Another UserSkill already references this skill');
+            }
+
+            await skillService.deleteSkill(id);
 
             res.status(200).json({
                 success: true,
-                package: pkg
+                message: "Deleted successfully"
             });
-        } catch (error) {
-            next(error);
-        }
-    }
 
-    async createPackage(req, res, next) {
-        try {
-            const userId = req.userId;
-            const account = await accountService.getAccountByUserId(userId);
-
-            if (!account) {
-                throw new ApiError(404, 'Account not found');
-            }
-
-            if (account.role !== ROLES.ADMIN) {
-                throw new ApiError(403, "You don't have permission to access this resource");
-            }
-
-            const pkg = await packageService.createPackage(req.body);
-
-            res.status(201).json({
-                success: true,
-                package: pkg
-            });
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    async updatePackage(req, res, next) {
-        try {
-            const userId = req.userId;
-
-            const account = await accountService.getAccountByUserId(userId);
-
-            if (!account) {
-                throw new ApiError(404, 'Account not found');
-            }
-
-            if (account.role !== ROLES.ADMIN) {
-                throw new ApiError(403, "You don't have permission to access this resource");
-            }
-            
-            const packageId = req.params.id;
-
-            if (!packageId) {
-                throw new ApiError(400, 'Params must have id');
-            }
-
-            const numOfTransactions = await transactionHistoryService.countTransactionHistoriesByPackage(packageId);
-
-            if (numOfTransactions > 0) {
-                throw new ApiError('Another TransactionHistory already references this package');
-            }
-
-            const pkg = await packageService.updatePackage(packageId, req.body);
-
-            res.status(200).json({
-                success: true,
-                package: pkg
-            });
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    async deletePakage(req, res, next) {
-        try {
-            const userId = req.userId;
-            const account = await accountService.getAccountByUserId(userId);
-
-            if (!account) {
-                throw new ApiError(404, 'Account not found');
-            }
-
-            if (account.role !== ROLES.ADMIN) {
-                throw new ApiError(403, "You don't have permission to access this resource");
-            }
-
-            const packageId = req.params.id;
-
-            if (!packageId) {
-                throw new ApiError(400, 'Params must have id');
-            }
-
-            const numOfTransactions = await transactionHistoryService.countTransactionHistoriesByPackage(packageId);
-
-            if (numOfTransactions > 0) {
-                throw new ApiError('Another TransactionHistory already references this package');
-            }
-
-            await packageService.deletePackage(packageId);
-
-            res.status(200).json({
-                success: true,
-                message: 'Deleted successfully'
-            });
         } catch (error) {
             next(error);
         }
     }
 }
 
-module.exports = new PackageController;
+module.exports = new SkillController;
