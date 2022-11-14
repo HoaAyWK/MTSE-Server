@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-
+const { toJSON } = require('./plugins');
 
 const UserSchema = new mongoose.Schema({
     email: {
@@ -12,15 +12,15 @@ const UserSchema = new mongoose.Schema({
     },
     address: {
         type: String,
-        required: true
+        required: false
     },
     instroduction: {
         type: String,
-        required: true
+        required: false
     },
     image: {
         type: String,
-        required: true
+        required: false
     },
     stars: {
         type: Number,
