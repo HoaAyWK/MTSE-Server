@@ -12,7 +12,7 @@ const employerSchema = new mongoose.Schema({
         type: String,
     },
     companySize: {
-        type: Number,
+        type: String,
     },
     companyType: {
         type: String,
