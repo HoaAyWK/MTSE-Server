@@ -14,7 +14,7 @@ class SkillService {
             return []
         }
 
-        var end = start + num
+        var end = parseInt(start) + parseInt(num)
         if (end > length){
             end = length
         }
