@@ -14,8 +14,8 @@ class PackageService {
         return packages;
     }
 
-    async createPackage(package) {
-        return await Package.create(package);
+    async createPackage(pkg) {
+        return await Package.create(pkg);
     }
 
     async getPackageById(id) {
@@ -23,9 +23,9 @@ class PackageService {
     }
 
     async updatePackage(id, updateBody) {
-        const package = await Package.findById(id).lean();
+        const pkg = await Package.findById(id).lean();
 
-        if (!package) {
+        if (!pkg) {
             throw new ApiError(404, 'Package not found');
         }
 
@@ -33,13 +33,13 @@ class PackageService {
     }
 
     async deletePackage(id) {
-        const package = await Package.findById(id);
+        const pkg = await Package.findById(id);
 
-        if (!package) {
+        if (!pkg) {
             throw new ApiError(404, 'Package not found');
         }
 
-        await package.remove();
+        await pkg.remove();
     }
 }
 

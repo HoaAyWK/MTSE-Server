@@ -11,13 +11,9 @@ const connectDatabase = async () => {
     }
 };
 
-const connectForTest = () => {
-    mongoose.Promise = Promise;
-    mongoose.connect(process.env.MONGODB_URL);
+const disconnectDatabase = async () => {
+    await mongoose.connection.close();
+    console.log('Disconnected database');
 };
 
-const disconnectForTest = (done) => {
-    mongoose.disconnect(done);
-};
-
-module.exports = { connectDatabase, connectForTest, disconnectForTest };
+module.exports = { connectDatabase, disconnectDatabase };

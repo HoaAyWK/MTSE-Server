@@ -1,6 +1,7 @@
 const ApiError = require('../utils/ApiError');
-const { packageService } = require('../services/packageService');
+const { packageService, accountService } = require('../services');
 const transactionHistoryService = require('../services/transactionHistoryService');
+const { ROLES } = require('../constants/constants');
 
 class PackageController {
     async getPackages(req, res, next) {
@@ -26,11 +27,11 @@ class PackageController {
                 throw new ApiError(400, 'Params must have id');
             }
 
-            const package = await packageService.getPackage(id);
+            const pkg = await packageService.getPackage(id);
 
             res.status(200).json({
                 success: true,
-                package
+                package: pkg
             });
         } catch (error) {
             next(error);
@@ -39,11 +40,22 @@ class PackageController {
 
     async createPackage(req, res, next) {
         try {
-            const package = await packageService.createPackage(req.body);
+            const userId = req.userId;
+            const account = await accountService.getAccountByUserId(userId);
+
+            if (!account) {
+                throw new ApiError(404, 'Account not found');
+            }
+
+            if (account.role !== ROLES.ADMIN) {
+                throw new ApiError(403, "You don't have permission to access this resource");
+            }
+
+            const pkg = await packageService.createPackage(req.body);
 
             res.status(201).json({
                 success: true,
-                package
+                package: pkg
             });
         } catch (error) {
             next(error);
@@ -52,6 +64,18 @@ class PackageController {
 
     async updatePackage(req, res, next) {
         try {
+            const userId = req.userId;
+
+            const account = await accountService.getAccountByUserId(userId);
+
+            if (!account) {
+                throw new ApiError(404, 'Account not found');
+            }
+
+            if (account.role !== ROLES.ADMIN) {
+                throw new ApiError(403, "You don't have permission to access this resource");
+            }
+            
             const packageId = req.params.id;
 
             if (!packageId) {
@@ -61,14 +85,14 @@ class PackageController {
             const numOfTransactions = await transactionHistoryService.countTransactionHistoriesByPackage(packageId);
 
             if (numOfTransactions > 0) {
-                throw new ApiError('This package already refer by another TransactionHistory');
+                throw new ApiError('Another TransactionHistory already references this package');
             }
 
-            const package = await packageService.updatePackage(packageId, req.body);
+            const pkg = await packageService.updatePackage(packageId, req.body);
 
             res.status(200).json({
                 success: true,
-                package
+                package: pkg
             });
         } catch (error) {
             next(error);
@@ -77,6 +101,17 @@ class PackageController {
 
     async deletePakage(req, res, next) {
         try {
+            const userId = req.userId;
+            const account = await accountService.getAccountByUserId(userId);
+
+            if (!account) {
+                throw new ApiError(404, 'Account not found');
+            }
+
+            if (account.role !== ROLES.ADMIN) {
+                throw new ApiError(403, "You don't have permission to access this resource");
+            }
+
             const packageId = req.params.id;
 
             if (!packageId) {
@@ -86,10 +121,10 @@ class PackageController {
             const numOfTransactions = await transactionHistoryService.countTransactionHistoriesByPackage(packageId);
 
             if (numOfTransactions > 0) {
-                throw new ApiError('This package already refer by another TransactionHistory');
+                throw new ApiError('Another TransactionHistory already references this package');
             }
 
-            await packageService.deletePakage(packageId);
+            await packageService.deletePackage(packageId);
 
             res.status(200).json({
                 success: true,

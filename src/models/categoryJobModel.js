@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const { toJSON } = require('./plugins');
 
-const categoryJobModel = new Schema({
+const caegoryJobSchema = new Schema({
     job: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
@@ -16,8 +16,8 @@ const categoryJobModel = new Schema({
     },
 });
 
-categoryJobModel.plugin(toJSON);
+caegoryJobSchema.plugin(toJSON);
 
-const CategoryJob = mongoose.model('CategoryJob', categoryJobModel);
+const CategoryJob = mongoose.model('CategoryJob', caegoryJobSchema);
 
 module.exports = CategoryJob;

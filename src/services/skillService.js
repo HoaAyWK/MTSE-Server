@@ -47,7 +47,7 @@ class SkillService {
             throw new ApiError(404, 'Skill not found');
         }
 
-        return await skill.findByIdAndUpdate(id, { $set: updateBody }, { new: true, runValidators: true });
+        return await Skill.findByIdAndUpdate(id, { $set: updateBody }, { new: true, runValidators: true });
     }
 
     async deleteSkill(id) {

@@ -1,9 +1,17 @@
-const express = require('express')
-const router = express.Router()
-const skillController = require('../../controllers/skillController')
-const jwtFilter = require('../../middleware/jwtFilter')
+const { Router } = require('express');
 
-router.post('/create', jwtFilter.verifyToken, skillController.createSkill)
-router.get('/show', skillController.getSkills)
+const { skillController } = require('../../controllers');
+const jwtFilter = require('../../middleware/jwtFilter');
 
-module.exports = router
+const router = Router();
+
+router.get('/', skillController.getSkills);
+
+router.post('/admin/create', jwtFilter.verifyToken, skillController.createSkill);
+
+router.route('/admin/:id')
+    .put(jwtFilter.verifyToken, skillController.updateSkill)
+    .delete(jwtFilter.verifyToken, skillController.deleteSkill);
+
+module.exports = router;
+

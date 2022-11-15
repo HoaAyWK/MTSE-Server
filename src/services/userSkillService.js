@@ -1,5 +1,5 @@
 const ApiError = require('../utils/ApiError');
-const { UserSkill } = reuqire('../models');
+const { UserSkill } = require('../models');
 
 class UserSkillService {
     async getUserSkills(num) {
@@ -27,7 +27,9 @@ class UserSkillService {
             .populate('user skill')
     }
 
-    async getUserSkillsBySkill(skillId)
+    async countUserSkillsBySkill(skillId) {
+        return await UserSkill.count({ skill: skillId });
+    }
 
     async updateUserSkill(id, updateBody) {
         const userSkill = await UserSkill.findById(id).lean();

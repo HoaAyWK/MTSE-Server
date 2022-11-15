@@ -1,9 +1,17 @@
-const express = require('express')
-const router = express.Router()
-const categoryController = require('../../controllers/categoryController')
-const jwtFilter = require('../../middleware/jwtFilter')
+const { Router } = require('express');
 
-router.post('/create', jwtFilter.verifyToken, categoryController.createCategory)
-router.get('/show', categoryController.getCategories)
+const { categoryController } = require('../../controllers');
+const jwtFilter = require('../../middleware/jwtFilter');
 
-module.exports = router
+const router = Router();
+
+router.get('/', categoryController.getCategories);
+
+router.post('/admin/create', jwtFilter.verifyToken, categoryController.createCategory);
+
+router.route('/admin/:id')
+    .put(jwtFilter.verifyToken, categoryController.updateCategory)
+    .delete(jwtFilter.verifyToken, categoryController.deleteCategory);
+
+module.exports = router;
+
