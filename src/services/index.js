@@ -7,4 +7,4 @@ module.exports.userSkillService = require('./userSkillService');
 module.exports.packageService = require('./packageService');
 module.exports.accountService = require('./accountService');
 module.exports.categoryJobService = require('./categoryJobService');
-
+module.exports.userService = require('./userService');
