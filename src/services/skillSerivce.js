@@ -2,16 +2,30 @@ const ApiError = require('../utils/ApiError');
 const { Skill } = require('../models');
 
 class SkillService {
-    async getSkills(num) {
-        let skills;
-
-        if (num) {
-            skills = await Skill.find().limit(num);
-        } else {
-            skills = await Skill.find();
+    async getSkills(num, page) {
+        const skills = await Skill.find()
+        const length = skills.length
+        if (num == null || page == null){
+            return skills
         }
 
-        return skills;
+        var start = (page-1)*num
+        if (start > length){
+            return []
+        }
+
+        var end = start + num
+        if (end > length){
+            end = length
+        }
+
+        return skills.slice(start, end)
+    }
+
+    async getNumOfSkills(){
+        const skills = await Skill.find()
+
+        return skills.length
     }
 
     async getSkillsByUser(userId) {

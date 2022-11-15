@@ -14,6 +14,10 @@ class AppliedService {
         return applieds;
     }
 
+    async cancelApply(appliedId){
+        await Applied.findByIdAndUpdate(appliedId, {status: false, canceledAt: Date.now()})
+    }
+
     async createApplied(applied) {
         return await Applied.create(applied);
     }
@@ -22,7 +26,30 @@ class AppliedService {
         return await Applied.findById(id);
     }
 
-    async getAppliedsByFreelancer(freelancerId) {
+    async getAppliedByJob(jobId, num, page){
+        const allApplied = await Applied.find({job: jobId, status:true})
+        const length = allApplied.length
+        var start = (page - 1)*num
+        if (start > length){
+            return []
+        }
+        var end = start + num
+        if (end > length){
+            end = length
+        }
+        return allApplied.slice(start, end)
+    }
+
+    async getNumOfAppliedByJob(jobId){
+        const allApplied = await Applied.find({job: jobId, status:true})
+        return allApplied.length
+    }
+
+    async getAppliedByFreelancerAndJob(freelancerId, jobId){
+        return await Applied.findOne({ freelancer: freelancerId, job: jobId });
+    }
+
+    async getAppliedByFreelancer(freelancerId) {
         return await Applied.find({ freelancer: freelancerId });
     }
 

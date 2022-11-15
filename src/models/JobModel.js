@@ -17,7 +17,7 @@ const jobSchema = new Schema({
         type: Date,
         required: true
     },
-    endDate: {
+    expireDate: {
         type: Date,
         required: true
     },
@@ -39,6 +39,6 @@ const jobSchema = new Schema({
 
 jobSchema.plugin(toJSON);
 
-const Category = mongoose.model('Category', jobSchema);
+const Job = mongoose.model('Job', jobSchema);
 
-module.exports = Category;
+module.exports = Job;

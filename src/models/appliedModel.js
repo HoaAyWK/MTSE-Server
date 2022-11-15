@@ -18,7 +18,10 @@ const appliedSchema = new Schema({
         type: Date,
         default: Date.now()
     },
-    cancelledAt: Date,
+    canceledAt: {
+        type: Date,
+        default: null
+    },
     status: {
         type: Boolean,
         default: true,

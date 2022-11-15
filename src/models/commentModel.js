@@ -23,6 +23,14 @@ const commnetSchema = new Schema({
         required: true,
         min: 1,
         max: 5
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now()
+    },
+    modifiedAt: {
+        type: Date,
+        default: null
     }
 }, { timestamps: true });
 

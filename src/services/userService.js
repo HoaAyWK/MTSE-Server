@@ -25,6 +25,11 @@ class UserService{
 
         return user
     }
+
+    async changeStar(userId, stars){
+        await User.findByIdAndUpdate(userId, {stars})
+    }
+
 }
 
 module.exports = new UserService

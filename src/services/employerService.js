@@ -8,6 +8,10 @@ class EmployerService{
 
         return newEmployer
     }  
+
+    async getEmployerByUserId(userId){
+        return await Employer.findOne({user: userId})
+    }
 }
 
 

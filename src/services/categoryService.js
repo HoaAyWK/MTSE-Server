@@ -2,16 +2,34 @@ const ApiError = require('../utils/ApiError');
 const { Category } = require('../models');
 
 class CategoryService {
-    async getCategories(num) {
-        let categories;
+    async getCategories(num, page) {
+        const categories = await Category.find()
 
-        if (num) {
-            categories = await Category.find().limit(num);
-        } else {
-            categories = await Category.find();
+        if(num == null || page == null){
+            return categories
         }
 
-        return categories;
+        const length = categories.length
+
+        const start = (page-1)*num
+        if (start > length){
+            return []
+        }
+
+        var end = start + num
+
+        if (end > length){
+            end = length
+        }
+
+        return categories.slice(start, end)
+    }   
+
+
+    async getNumOfCategories(){
+        const categories = await Category.find()
+
+        return categories.length
     }
 
     async createCategory(category) {
