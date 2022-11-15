@@ -8,11 +8,12 @@ class CategoryController {
         try {
             const { num, page } = req.query;
             const categories = await categoryService.getCategories(num, page);
+            const length = await categoryService.getNumOfCategories();
 
             res.status(200).json({
-                success: true,
-                count: categories.length,
-                categories
+                categories,
+                length,
+                totalPages: calTotalPages(num, length)
             });
         } catch (error) {
             next(error);
