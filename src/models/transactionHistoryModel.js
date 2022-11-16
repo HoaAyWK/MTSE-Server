@@ -14,10 +14,18 @@ const transactionHistorySchema = new Schema({
         required: true,
         ref: 'Package'
     },
+    price: {
+        type: Number,
+        requried: true
+    },
+    month: {
+        type: String,
+        required: true
+    }
 }, { timestamps: true });
 
 transactionHistorySchema.plugin(toJSON);
 
-const TransactionSchema = mongoose.model('TransactionSchema', transactionHistorySchema);
+const TransactionHistory = mongoose.model('TransactionHistory', transactionHistorySchema);
 
-module.exports = TransactionSchema;
+module.exports = TransactionHistory;

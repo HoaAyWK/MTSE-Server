@@ -30,6 +30,15 @@ class UserService{
         await User.findByIdAndUpdate(userId, {stars})
     }
 
+
+    async updateUser(userId, updateBody) {
+        return await User.findByIdAndUpdate(userId, { $set: updateBody }, { new: true, runValidators: true });
+    }
+
+
+    async countUsers() {
+        return await User.count();
+    }
 }
 
 module.exports = new UserService

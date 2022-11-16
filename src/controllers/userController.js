@@ -27,6 +27,27 @@ class UserController{
             next(error);
         }
     }
+
+
+    async updateUser(req, res, next) {
+        try {
+            const user = await userService.updateUser(req.userId, req.body);
+            const account = await accountService.getAccountByUserId(req.userId);
+
+            if (!account) {
+                throw new ApiError(400, 'Account not found');
+            }
+
+            user._doc.role = account.role;
+
+            res.status(200).json({
+                success: true,
+                user
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
 }   
 
 module.exports = new UserController

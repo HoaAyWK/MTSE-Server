@@ -11,8 +11,12 @@ const ADMIN = Object.freeze({
     ADDRESS: 'Viet Name'
 });
 
+const MESSAGE_ERRORS = Object.freeze({
+    UNAUTHORIZE: "You don't have permission to access this resource"
+});
 
 module.exports = {
     ROLES,
-    ADMIN
+    ADMIN,
+    MESSAGE_ERRORS
 };

@@ -17,6 +17,10 @@ class EmployerService{
         return await Employer.findById(id)
     }
 
+    async getEmployers() {
+        return await Employer.find().populate('user');
+    }
+
     async handlePost(employer, handle, num){
         console.log(employer)
         if (handle == true){

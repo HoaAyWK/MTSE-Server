@@ -14,7 +14,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-    instroduction: {
+    introduction: {
         type: String,
         required: false
     },

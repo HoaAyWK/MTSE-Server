@@ -16,6 +16,10 @@ class FreelancerService{
     async getFreelancerById(id){
         return await Freelancer.findById(id)
     }
+
+    async getFreelancers() {
+        return await Freelancer.find().populate({ path: 'user'});
+    }
 }
 
 module.exports = new FreelancerService
