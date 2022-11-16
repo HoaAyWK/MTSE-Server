@@ -11,14 +11,14 @@ class AccountController {
             if (!user) {
                 return res.status(400).json({
                     success: false,
-                    message: "Invalied Email or Password"
+                    message: "Invalid Email or Password"
                 })
             }
             const account = await accountService.getAccountByUserId(user._id)
             if (!account) {
                 return res.status(400).json({
                     success: false,
-                    message: "Invalied Email or Password"
+                    message: "Invalid Email or Password"
                 })
             }
 
@@ -33,13 +33,13 @@ class AccountController {
             if (!checkedPassword) {
                 return res.status(400).json({
                     success: false,
-                    message: "Invalied Email or Password"
+                    message: "Invalid Email or Password"
                 })
             }
 
             const accessToken = jwtFilter.generateToken(user._id)
 
-            return res.status(400).json({
+            return res.status(200).json({
                 success: true,
                 message: "Login Successfully",
                 accessToken
