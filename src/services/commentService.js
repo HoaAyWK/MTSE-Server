@@ -14,6 +14,10 @@ class CommentService {
         return comments;
     }
 
+    async editComment(commentId, comment){
+        await Comment.findByIdAndUpdate(commentId, {star: comment.star, content: comment.content, modifiedAt: Date.now()})
+    }
+
     async getCommentsBySender(senderId) {
         return await Comment.find({ sender: senderId });
     }

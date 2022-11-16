@@ -1,4 +1,5 @@
 const commentService = require('../services/commentService')
+
 const userService = require('../services/userService')
 
 
@@ -89,6 +90,74 @@ class CommentController{
                 isPostedComments
             })
         }
+        catch(error){
+            return res.status(500).json({
+                success: false,
+                message: "Internal Error Server"
+            })
+        }
+    }
+
+
+    async editComment(req, res){
+        try{
+            if(!req.userId){
+                return res.status(400).json({
+                    success: false,
+                    message: "Unauthorization"
+                })
+            }
+
+            if (!req.query.id){
+                return res.status(400).json({
+                    success: false,
+                    message: "Unknow Comment"
+                })
+            }
+
+            const comment = await commentService.getCommentById(req.query.id)
+
+            if (!comment){
+                return res.status(400).json({
+                    success: false,
+                    message: "Unknow Comment"
+                })
+            }
+
+            if (comment.sender != req.userId){
+                return res.status(400).json({
+                    success: false,
+                    message: "You are not Owner of Comment"
+                })
+            }
+
+            const {star} = req.body
+
+            const comments = await commentService.getCommentsByReceiver(comment.receiver)
+
+            const receiver = await userService.getUserById(comment.receiver)
+
+            if (!receiver){
+                return res.status(400).json({
+                    success: false,
+                    message: "Unknow Receiver"
+                })
+            }
+
+            const oldStar = comment.star
+
+            const newStar = ((receiver.stars)*(comments.length) - oldStar + star) / (comments.length)
+
+            await userService.changeStar(receiver.id, newStar)
+
+            await commentService.editComment(comment.id, req.body)
+
+            return res.status(200).json({
+                success: true,
+                message: "Edit Comment Successfully"
+            })
+
+        }   
         catch(error){
             return res.status(500).json({
                 success: false,
