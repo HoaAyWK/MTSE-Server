@@ -5,5 +5,6 @@ const jwtFilter = require('../../middleware/jwtFilter')
 
 router.post('/create', jwtFilter.verifyToken, commentController.createComment)
 router.get('/my', jwtFilter.verifyToken, commentController.getMyComments)
+router.put('/edit', jwtFilter.verifyToken, commentController.editComment)
 
 module.exports = router

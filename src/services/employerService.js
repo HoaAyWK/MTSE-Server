@@ -12,6 +12,20 @@ class EmployerService{
     async getEmployerByUserId(userId){
         return await Employer.findOne({user: userId})
     }
+
+    async getEmployerById(id){
+        return await Employer.findById(id)
+    }
+
+    async handlePost(employer, handle, num){
+        console.log(employer)
+        if (handle == true){
+            await Employer.findByIdAndUpdate(employer._id, {canPost: employer.canPost + num})
+        }
+        else{
+            await Employer.findByIdAndUpdate(employer._id, {canPost: employer.canPost - num})
+        }
+    }
 }
 
 
