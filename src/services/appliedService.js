@@ -26,6 +26,11 @@ class AppliedService {
         return await Applied.findById(id);
     }
 
+    async getAppliedsByJobForAdmin(jobId) {
+        return await Applied.find({ job: jobId })
+            .populate({ path: 'freelancer', populate: { path: 'user' }});
+    }
+
     async getAppliedByJob(jobId, num, page){
         const allApplied = await Applied.find({job: jobId, status:true})
         const length = allApplied.length

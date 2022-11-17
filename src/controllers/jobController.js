@@ -112,11 +112,6 @@ class JobController{
             const jobs = await jobService.getJobs(num, page)
             const length = await jobService.getNumOfJobs()
 
-            for (var i=0; i<jobs.length; i++){
-                var employer = await employerService.getEmployerById(jobs[i].employer)
-                jobs[i].employer = employer
-            }
-
             return res.status(200).json({
                 jobs,
                 length,

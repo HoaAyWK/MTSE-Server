@@ -1,8 +1,10 @@
+const ApiError = require('../utils/ApiError');
 const appliedService = require('../services/appliedService')
 const accountService = require('../services/accountService')
 const jobService = require('../services/jobService')
 const freelancerService = require('../services/freelancerService')
 const employerService = require('../services/employerService')
+const { ROLES } = require('../constants/constants'); 
 
 class AppliedController{
     async addApply(req, res){
@@ -179,6 +181,26 @@ class AppliedController{
                 success: false,
                 message: "Internal Error Server"
             })
+        }
+    }
+
+    async getAppliedsByJobForAdmin(req, res, next) {
+        try {
+            const account = await accountService.getAccountByUserId(req.userId);
+
+            if (!account) {
+                throw new ApiError(400, 'Account not found');
+            }
+
+            if (account.role !== ROLES.ADMIN) {
+                throw new ApiError(403, MESSAGE_ERRORS.UNAUTHORIZE);
+            }
+
+            const applieds = await appliedService.getAppliedsByJobForAdmin(req.params.job);
+
+            res.status(200).json({ success: true, applieds });
+        } catch (error) {
+            next(error);
         }
     }
 }
