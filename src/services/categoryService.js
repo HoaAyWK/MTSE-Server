@@ -25,6 +25,11 @@ class CategoryService {
     }   
 
 
+    async getCategoriesInfo(info){
+        return await Category.find({name: {$regex: info, $options: "i"}})
+    }
+
+
     async getNumOfCategories(){
         const categories = await Category.find()
 

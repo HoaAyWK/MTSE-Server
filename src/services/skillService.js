@@ -22,6 +22,10 @@ class SkillService {
         return skills.slice(start, end)
     }
 
+    async getSkillsByInfo(info){
+        return await Skill.find({name: {$regex: info, $options: "i"}})
+    }
+
     async getNumOfSkills(){
         const skills = await Skill.find()
 
