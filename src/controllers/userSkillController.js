@@ -36,6 +36,8 @@ class UserSkillController{
             })
         }
     }
+
+    
 }
 
 module.exports = new UserSkillController
