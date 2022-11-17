@@ -27,6 +27,13 @@ class JobService {
 
     }
 
+    async getJobsByInfo(info){
+        return await Job.find({name: {$regex: info, $options: "i"}, description: {$regex: info, $options: "i"}})
+    }
+    async getJobsByCategory(categoryId){
+        return await Job.find({category: categoryId})
+    }
+
     async getNumOfJobs(){
         const jobs = await Job.find({status: true})
         return jobs.length
@@ -45,11 +52,6 @@ class JobService {
     }
 
     async updateJob(id, updateBody) {
-        const job = await Job.findById(id).lean();
-
-        if (!job) {
-            throw new ApiError(404, 'Job not found');
-        }
 
         return await Job.findByIdAndUpdate(id, { $set: updateBody }, { new: true, runValidators: true });
     }
