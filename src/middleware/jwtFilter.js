@@ -7,7 +7,7 @@ class JwtFiler{
         const token = authHeader && authHeader.split(' ')[1];
         
         if (!token)
-            return res.json({success: false, message: 'Invalid token'});
+            return res.status(400).json({success: false, message: 'Invalid token'});
         try{
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
     

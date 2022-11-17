@@ -21,7 +21,7 @@ class FreelancerController {
             await accountService.saveAccount(req.body)
             await freelancerService.saveFreelancer(req.body)
 
-            return res.status(400).json({
+            return res.status(200).json({
                 success: true,
                 message: "Register Freelancer Successfully"
             })

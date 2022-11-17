@@ -22,9 +22,10 @@ afterAll(async () => {
 
 describe('Category', () => {
     const num = 2;
-    describe(`GET /api/v1/categories?num=${num}`, () => {
-        test(`it should return categories with limit ${num}`, async () => {
-            const res = await request(app).get(`/api/v1/categories?num=${num}`);
+    const page = 2;
+    describe(`GET /api/v1/categories?num=${num}&page=${page}`, () => {
+        test(`it should return categories with num ${num} and page ${page}`, async () => {
+            const res = await request(app).get(`/api/v1/categories?num=${num}&page=${page}`);
 
             expect(res.statusCode).toBe(200);
             expect(Array.isArray(res.body.categories)).toBe(true);

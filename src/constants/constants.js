@@ -1,3 +1,7 @@
+const mongoose = require('mongoose');
+
+const JOB_ID = new mongoose.Types.ObjectId();
+
 const ROLES = Object.freeze({
     FREELANCER: 'Freelancer',
     EMPLOYER: 'Employer',
@@ -12,6 +16,7 @@ const ADMIN = Object.freeze({
 });
 
 const FREELANCER = Object.freeze({
+    ID: new mongoose.Types.ObjectId(),
     EMAIL: 'freesir@gmail.com',
     PASSWORD: '123456',
     PHONE: '0831923041',
@@ -21,7 +26,16 @@ const FREELANCER = Object.freeze({
     LASTNAME: 'Tran'
 });
 
+const CONFIRMED_EMAIL_USER = Object.freeze({
+    ID: new mongoose.Types.ObjectId(),
+    EMAIL: 'cfmemail@gmail.com',
+    PASSWORD: '123456',
+    PHONE: '0831923041',
+    ADDRESS: 'Ba Dinh, Ha Noi, Viet Nam',
+});
+
 const EMPLOYER = Object.freeze({
+    ID: new mongoose.Types.ObjectId(),
     EMAIL: 'emer@gmail.com',
     PASSWORD: '123456',
     PHONE: '07399123591',
@@ -33,6 +47,13 @@ const EMPLOYER = Object.freeze({
     FOUNDING_DATE: '10-21-2015'
 });
 
+const NO_CONFIRMED_EMAIL_USER = Object.freeze({
+    EMAIL: 'nocfemail@gmail.com',
+    PASSWORD: '123456',
+    ADDRESS: 'Test',
+    PHONE: '0132132131231'
+});
+ 
 
 const MESSAGE_ERRORS = Object.freeze({
     UNAUTHORIZE: "You don't have permission to access this resource"
@@ -43,5 +64,8 @@ module.exports = {
     ADMIN,
     FREELANCER,
     EMPLOYER,
-    MESSAGE_ERRORS
+    NO_CONFIRMED_EMAIL_USER,
+    CONFIRMED_EMAIL_USER,
+    MESSAGE_ERRORS,
+    JOB_ID
 };

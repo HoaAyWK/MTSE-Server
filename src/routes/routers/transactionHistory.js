@@ -5,7 +5,6 @@ const jwtFilter = require('../../middleware/jwtFilter');
 
 const router = Router();
 
-router.post('/create', transactionHistoryController.createTransaction);
 router.get('/', jwtFilter.verifyToken, transactionHistoryController.getTransactions);
 
 
