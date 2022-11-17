@@ -17,10 +17,6 @@ const transactionHistorySchema = new Schema({
     price: {
         type: Number,
         requried: true
-    },
-    month: {
-        type: String,
-        required: true
     }
 }, { timestamps: true });
 

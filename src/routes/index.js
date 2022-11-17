@@ -10,6 +10,7 @@ const appliedRouter = require('./routers/applied')
 const commentRouter = require('./routers/comment')
 const userRouter = require('./routers/user');
 const transactionHistoryRouter = require('./routers/transactionHistory');
+const statsRouter = require('./routers/stats');
 const categoryJobRouter = require('./routers/categoryJob')
 const userSkillRouter = require('./routers/userSkill')
 const searchRouter = require('./routers/search')
@@ -30,6 +31,7 @@ const route = (app) => {
     app.use('/api/v1/categoryjob', categoryJobRouter)
     app.use('/api/v1/userskill', userSkillRouter)
     app.use('/api/v1/search', searchRouter)
+    app.use('/api/v1/stats', statsRouter);
 }
 
 module.exports = route

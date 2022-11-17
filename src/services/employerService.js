@@ -30,6 +30,10 @@ class EmployerService{
             await Employer.findByIdAndUpdate(employer._id, {canPost: employer.canPost - num})
         }
     }
+
+    async countEmployer() {
+        return await Employer.count();
+    }
 }
 
 
