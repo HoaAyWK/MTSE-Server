@@ -3,9 +3,10 @@ require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 const mongoose = require('mongoose');
 const argon2 = require('argon2');
 
-const { User, Account, Skill, Category, Package } = require('../models');
+const { User, Account, Skill, Category, Package, Employer, Freelancer, Job } = require('../models');
 const { connectDatabase } = require('../config/database');
-const { ADMIN, ROLES } = require('../constants/constants');
+const { ADMIN, ROLES, EMPLOYER, FREELANCER } = require('../constants/constants');
+const freelancerController = require('../controllers/freelancerController');
 
 connectDatabase();
 
@@ -72,6 +73,8 @@ const seedPackages = async () => {
 const seedUsers = async () => {
     try {
         const adminExist = await User.findOne({ email: ADMIN.EMAIL });
+        const freelancerExist = await User.findOne({ email: FREELANCER.EMAIL });
+        const employerExist = await User.findOne({ email: EMPLOYER.EMAIL });
 
         if (adminExist) {
             const accountExist = await Account.findOne({ user: adminExist.id });
@@ -83,6 +86,30 @@ const seedUsers = async () => {
 
             await adminExist.remove();
             console.log('Deleted admin');
+        }
+
+        if (freelancerExist) {
+            const faccountExist = await Account.findOne({ user: freelancerExist.id });
+
+            if (faccountExist) {
+                await faccountExist.remove();
+                console.log('Deleted freelancer account');
+            }
+
+            await freelancerExist.remove();
+            console.log('Deleted freelancer account');
+        }
+
+        if (employerExist) {
+            const eaccountExist = await Account.findOne({ user: employerExist.id });
+
+            if (eaccountExist) {
+                await eaccountExist.remove();
+                console.log('Deleted employer account');
+            }
+
+            await employerExist.remove();
+            console.log('Deleted employer account');
         }
 
         const admin = {
@@ -106,6 +133,83 @@ const seedUsers = async () => {
         await Account.create(adminAccount);
 
         console.log('Created admin account');
+
+        const employer = {
+            email: EMPLOYER.EMAIL,
+            phone: EMPLOYER.PHONE,
+            address: EMPLOYER.ADDRESS,
+            introduction: EMPLOYER.INTRODUCTION,
+        };
+
+        const employerUser = await User.create(employer);
+
+        console.log("Created employer user");
+
+        const employerPasswordHashed = await argon2.hash(EMPLOYER.PASSWORD);
+
+        await Account.create({
+            user: employerUser.id,
+            password: employerPasswordHashed,
+            role: ROLES.EMPLOYER,
+            emailConfirmed: true
+        });
+
+        console.log("Created employer account");
+
+        const newEmployer = await Employer.create({
+            user: employerUser.id,
+            companyName: EMPLOYER.COMPANY_NAME,
+            companySize: EMPLOYER.COMPANY_SIZE,
+            companyType: EMPLOYER.COMPANY_TYPE,
+            foundingDate: EMPLOYER.FOUNDING_DATE
+        });
+
+        console.log("Created employer");
+
+        const freelancer = {
+            email: FREELANCER.EMAIL,
+            phone: FREELANCER.PHONE,
+            address: FREELANCER.ADDRESS,
+            introduction: FREELANCER.INTRODUCTION
+        };
+
+        const freelancerUser = await User.create(freelancer);
+
+        console.log("Created freelancer user");
+
+        const freelancerPasswordHashed = await argon2.hash(FREELANCER.PASSWORD);
+
+        await Account.create({
+            user: freelancerUser.id,
+            password: freelancerPasswordHashed,
+            role: ROLES.FREELANCER,
+            emailConfirmed: true
+        });
+
+        console.log("Created freelancer account");
+
+        await Freelancer.create({
+            user: freelancerUser.id,
+            firstName: FREELANCER.FIRSTNAME,
+            lastName: FREELANCER.LASTNAME
+        });
+
+        console.log("Created freelancer");
+
+
+        const jobs = [
+            { employer: newEmployer.id, startDate: '11-25-2022', expireDate: '12-10-2022', price: 500, name: 'Nostrud labore veniam adipisicing culpa adipisicing incididunt sint consectetur laborum anim', description: 'Lorem labore esse labore nulla velit eu nisi nisi fugiat. Deserunt adipisicing minim laboris pariatur. Proident irure aliquip ut fugiat nisi sint eu tempor reprehenderit sunt cupidatat. Culpa ut est duis elit adipisicing mollit. Fugiat aliquip amet magna fugiat ut magna non qui adipisicing sunt id tempor pariatur. Magna labore excepteur tempor cillum dolor dolor aliquip. Ullamco exercitation veniam adipisicing qui ad.'},
+            { employer: newEmployer.id, startDate: '11-30-2022', expireDate: '12-12-2022', price: 1000, name: 'Nostrud labore veniam adipisicing culpa adipisicing incididunt sint consectetur laborum anim', description: 'Lorem labore esse labore nulla velit eu nisi nisi fugiat. Deserunt adipisicing minim laboris pariatur. Proident irure aliquip ut fugiat nisi sint eu tempor reprehenderit sunt cupidatat. Culpa ut est duis elit adipisicing mollit. Fugiat aliquip amet magna fugiat ut magna non qui adipisicing sunt id tempor pariatur. Magna labore excepteur tempor cillum dolor dolor aliquip. Ullamco exercitation veniam adipisicing qui ad.'},
+            { employer: newEmployer.id, startDate: '11-29-2022', expireDate: '12-19-2022', price: 200, name: 'Nostrud labore veniam adipisicing culpa adipisicing incididunt sint consectetur laborum anim', description: 'Lorem labore esse labore nulla velit eu nisi nisi fugiat. Deserunt adipisicing minim laboris pariatur. Proident irure aliquip ut fugiat nisi sint eu tempor reprehenderit sunt cupidatat. Culpa ut est duis elit adipisicing mollit. Fugiat aliquip amet magna fugiat ut magna non qui adipisicing sunt id tempor pariatur. Magna labore excepteur tempor cillum dolor dolor aliquip. Ullamco exercitation veniam adipisicing qui ad.'},
+            { employer: newEmployer.id, startDate: '11-21-2022', expireDate: '12-21-2022', price: 700, name: 'Nostrud labore veniam adipisicing culpa adipisicing incididunt sint consectetur laborum anim', description: 'Lorem labore esse labore nulla velit eu nisi nisi fugiat. Deserunt adipisicing minim laboris pariatur. Proident irure aliquip ut fugiat nisi sint eu tempor reprehenderit sunt cupidatat. Culpa ut est duis elit adipisicing mollit. Fugiat aliquip amet magna fugiat ut magna non qui adipisicing sunt id tempor pariatur. Magna labore excepteur tempor cillum dolor dolor aliquip. Ullamco exercitation veniam adipisicing qui ad.'},
+            { employer: newEmployer.id, startDate: '11-30-2022', expireDate: '12-30-2022', price: 100, name: 'Nostrud labore veniam adipisicing culpa adipisicing incididunt sint consectetur laborum anim', description: 'Lorem labore esse labore nulla velit eu nisi nisi fugiat. Deserunt adipisicing minim laboris pariatur. Proident irure aliquip ut fugiat nisi sint eu tempor reprehenderit sunt cupidatat. Culpa ut est duis elit adipisicing mollit. Fugiat aliquip amet magna fugiat ut magna non qui adipisicing sunt id tempor pariatur. Magna labore excepteur tempor cillum dolor dolor aliquip. Ullamco exercitation veniam adipisicing qui ad.'},
+        ];
+
+        await Job.deleteMany();
+        console.log("Deleted jobs");
+
+        await Job.insertMany(jobs);
+        console.log("Created jobs");
 
     } catch (error) {
         console.log(error.message);

@@ -20,6 +20,10 @@ class FreelancerService{
     async getFreelancers() {
         return await Freelancer.find().populate({ path: 'user'});
     }
+
+    async countFreelancer() {
+        return await Freelancer.count();
+    }
 }
 
 module.exports = new FreelancerService

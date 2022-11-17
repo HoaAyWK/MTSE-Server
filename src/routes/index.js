@@ -10,6 +10,7 @@ const appliedRouter = require('./routers/applied')
 const commentRouter = require('./routers/comment')
 const userRouter = require('./routers/user');
 const transactionHistoryRouter = require('./routers/transactionHistory');
+const statsRouter = require('./routers/stats');
 
 const route = (app) => {
     app.use('/api/v1/freelancer', freelancerRouter)
@@ -24,6 +25,7 @@ const route = (app) => {
     app.use('/api/v1/checkout', checkoutRouter);
     app.use('/api/v1/users', userRouter);
     app.use('/api/v1/transactions', transactionHistoryRouter);
+    app.use('/api/v1/stats', statsRouter);
 }
 
 module.exports = route

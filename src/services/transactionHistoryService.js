@@ -1,7 +1,6 @@
 const ApiError = require('../utils/ApiError');
 const { TransactionHistory } = require('../models');
-const sevenDays = require('../utils/getDays');
-const { getPast12Months } = require("../utils/getMonths");
+const { sevenDays, thirtyDays } = require('../utils/getDays');
 const twentyFourHours = require('../utils/get24Hours');
 
 class TransactionHistoryService {
@@ -63,10 +62,6 @@ class TransactionHistoryService {
         let pastSevenDay = new Date(toDay);
         pastSevenDay.setDate(pastSevenDay.getDate() - 7);
 
-        const _24h = twentyFourHours();
-
-        console.log(_24h);
-
         const transactions = await TransactionHistory
             .aggregate([
                 {
@@ -99,42 +94,80 @@ class TransactionHistoryService {
         return dayObj;
     }
 
-
-    async getStats12Months() {
-        let thisDayLastYear = new Date();
-        thisDayLastYear.setDate(thisDayLastYear.getDate() - 365);
-
-        const past12Months = getPast12Months();
-
+    async getStats24Hours() {
+        let now = Date.now();
+        let yesterDay = new Date(now);
+        yesterDay.setDate(yesterDay.getDate() - 1);
+        
         const transactions = await TransactionHistory
             .aggregate([
                 {
                     $match: {
-                        createdAt: { $gte: thisDayLastYear }
+                        createdAt: { $gte: yesterDay }
                     },
                 },
                 {
                     $group: {
-                        _id: { month: '$month'},
+                        _id: { $dateToString: { format: '%HH', date: '$createdAt'}},
                         total: {
                             $sum: '$price'
                         }
-                    },
-                },
+                    }
+                }
             ]
         );
 
-        const monthsObj = {};
 
-        for (let month in past12Months) {
-            monthsObj[past12Months[month]] = 0;
+        const _24h = twentyFourHours();
+
+        const hoursObj = {};
+        
+        for (let hour in _24h) {
+            hoursObj[_24h[hour]] = 0;
         }
 
         for (let item in transactions) {
-            monthsObj[transactions[item]._id.month] = transactions[item].total;
+            hoursObj[transactions[item]._id] = transactions[item].total;
         }
 
-        return monthsObj;
+        return hoursObj;
+    }
+
+    async getStats30Days() {
+        const now = Date.now();
+        let past30Days = new Date(now);
+        past30Days.setDate(past30Days.getDate() - 30);
+
+        const transactions = await TransactionHistory.aggregate(
+            [
+                {
+                    $match: {
+                        createdAt: { $gte: past30Days }
+                    },
+                },
+                {
+                    $group: {
+                        _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt'}},
+                        total: {
+                            $sum: '$price'
+                        }
+                    }
+                }
+            ]
+        );
+
+        const daysObj = {};
+        const _30Days = thirtyDays();
+
+        for (let day in _30Days) {
+            daysObj[_30Days[day]] = 0;
+        }
+
+        for (let item in transactions) {
+            daysObj[transactions[item]._id] = transactions[item].total;
+        }
+
+        return daysObj;
     }
 }
 
