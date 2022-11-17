@@ -4,19 +4,6 @@ const ApiError = require("../utils/ApiError");
 
 
 class TransactionHistoryController {
-    async createTransaction(req, res, next) {
-        try {
-            const transaction = await transactionHistoryService.createTransactionHistory(req.body);
-
-            res.status(201).json({
-                success: true,
-                transaction
-            });
-        } catch (error) {
-            next(error);
-        }
-    }
-
     async getTransactions(req, res, next) {
         try {
             const account = await accountService.getAccountByUserId(req.userId);

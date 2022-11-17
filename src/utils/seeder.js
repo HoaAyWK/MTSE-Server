@@ -1,12 +1,10 @@
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
-const mongoose = require('mongoose');
 const argon2 = require('argon2');
 
 const { User, Account, Skill, Category, Package, Employer, Freelancer, Job, Applied, TransactionHistory } = require('../models');
 const { connectDatabase } = require('../config/database');
-const { ADMIN, ROLES, EMPLOYER, FREELANCER } = require('../constants/constants');
-const freelancerController = require('../controllers/freelancerController');
+const { ADMIN, ROLES, EMPLOYER, FREELANCER, NO_CONFIRMED_EMAIL_USER, JOB_ID, CONFIRMED_EMAIL_USER } = require('../constants/constants');
 
 connectDatabase();
 
@@ -107,6 +105,38 @@ const seedUsers = async () => {
 
         console.log('Created admin account');
 
+        const noCfEmail = {
+            email: NO_CONFIRMED_EMAIL_USER.EMAIL,
+            address: NO_CONFIRMED_EMAIL_USER.ADDRESS,
+            phone: NO_CONFIRMED_EMAIL_USER.PHONE
+        };
+
+        const noCfEmailUser = await User.create(noCfEmail);
+        const noCfEmailPasswordHashed = await argon2.hash(NO_CONFIRMED_EMAIL_USER.PASSWORD);
+        
+        await Account.create({
+            user: noCfEmailUser.id,
+            password: noCfEmailPasswordHashed,
+            role: ROLES.FREELANCER,
+            emailConfirmed: false
+        });
+
+        const cfmEmail = {
+            email: CONFIRMED_EMAIL_USER.EMAIL,
+            phone: CONFIRMED_EMAIL_USER.PHONE,
+            address: CONFIRMED_EMAIL_USER.ADDRESS
+        };
+
+        const cfmEmailUser = await User.create(cfmEmail);
+        const cfmPasswordHashed = await argon2.hash(CONFIRMED_EMAIL_USER.PASSWORD);
+
+        await Account.create({
+            user: cfmEmailUser.id,
+            password: cfmPasswordHashed,
+            role: ROLES.FREELANCER,
+            emailConfirmed: true
+        });
+
         const employer = {
             email: EMPLOYER.EMAIL,
             phone: EMPLOYER.PHONE,
@@ -130,6 +160,7 @@ const seedUsers = async () => {
         console.log("Created employer account");
 
         const newEmployer = await Employer.create({
+            _id: EMPLOYER.ID,
             user: employerUser.id,
             companyName: EMPLOYER.COMPANY_NAME,
             companySize: EMPLOYER.COMPANY_SIZE,
@@ -162,6 +193,7 @@ const seedUsers = async () => {
         console.log("Created freelancer account");
 
         const newFreelancer = await Freelancer.create({
+            _id: FREELANCER.ID,
             user: freelancerUser.id,
             firstName: FREELANCER.FIRSTNAME,
             lastName: FREELANCER.LASTNAME
@@ -185,6 +217,7 @@ const seedUsers = async () => {
         console.log("Created jobs");
 
         const jobData = { 
+            _id: JOB_ID,
             employer: newEmployer.id,
             startDate: '11-25-2022',
             expireDate: '12-10-2022',

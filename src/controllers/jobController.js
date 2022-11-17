@@ -161,7 +161,7 @@ class JobController{
             if (employer.id != job.employer){
                 return res.status(400).json({
                     success: false,
-                    message: "You are Owner of Job"
+                    message: "You are not Owner of Job"
                 })
             }
             
