@@ -14,6 +14,10 @@ class UserSkillService {
         return userSkills;
     }
 
+    async getUsersBySkill(skillId){
+        return await UserSkill.find({skill: skillId})
+    }
+
     async createUserSkill(userSkill) {
         return await UserSkill.create(userSkill);
     }
