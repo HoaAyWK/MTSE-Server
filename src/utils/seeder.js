@@ -3,7 +3,7 @@ require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 const mongoose = require('mongoose');
 const argon2 = require('argon2');
 
-const { User, Account, Skill, Category, Package, Employer, Freelancer, Job } = require('../models');
+const { User, Account, Skill, Category, Package, Employer, Freelancer, Job, Applied, TransactionHistory } = require('../models');
 const { connectDatabase } = require('../config/database');
 const { ADMIN, ROLES, EMPLOYER, FREELANCER } = require('../constants/constants');
 const freelancerController = require('../controllers/freelancerController');
@@ -72,52 +72,25 @@ const seedPackages = async () => {
 
 const seedUsers = async () => {
     try {
-        const adminExist = await User.findOne({ email: ADMIN.EMAIL });
-        const freelancerExist = await User.findOne({ email: FREELANCER.EMAIL });
-        const employerExist = await User.findOne({ email: EMPLOYER.EMAIL });
+        
 
-        if (adminExist) {
-            const accountExist = await Account.findOne({ user: adminExist.id });
-
-            if (accountExist) {
-                await accountExist.remove();
-                console.log('Deleted admin account');
-            }
-
-            await adminExist.remove();
-            console.log('Deleted admin');
-        }
-
-        if (freelancerExist) {
-            const faccountExist = await Account.findOne({ user: freelancerExist.id });
-
-            if (faccountExist) {
-                await faccountExist.remove();
-                console.log('Deleted freelancer account');
-            }
-
-            await freelancerExist.remove();
-            console.log('Deleted freelancer account');
-        }
-
-        if (employerExist) {
-            const eaccountExist = await Account.findOne({ user: employerExist.id });
-
-            if (eaccountExist) {
-                await eaccountExist.remove();
-                console.log('Deleted employer account');
-            }
-
-            await employerExist.remove();
-            console.log('Deleted employer account');
-        }
+        await Freelancer.deleteMany();
+        console.log('Deleted freelances');
+        await Employer.deleteMany();
+        console.log('Deleted employers');
+        await User.deleteMany();
+        console.log('Deleted users');
+        await Account.deleteMany();
+        console.log('Deleted accounts');
+        await TransactionHistory.deleteMany();
+        console.log('Deleted transacions');
 
         const admin = {
             email: ADMIN.EMAIL,
             phone: ADMIN.PHONE,
             address: ADMIN.ADDRESS
         };
-
+        
         const adminUser = await User.create(admin);
 
         console.log('Created admin');
@@ -188,7 +161,7 @@ const seedUsers = async () => {
 
         console.log("Created freelancer account");
 
-        await Freelancer.create({
+        const newFreelancer = await Freelancer.create({
             user: freelancerUser.id,
             firstName: FREELANCER.FIRSTNAME,
             lastName: FREELANCER.LASTNAME
@@ -210,6 +183,37 @@ const seedUsers = async () => {
 
         await Job.insertMany(jobs);
         console.log("Created jobs");
+
+        const jobData = { 
+            employer: newEmployer.id,
+            startDate: '11-25-2022',
+            expireDate: '12-10-2022',
+            price: 500,
+            name: 'Nostrud labore veniam adipisicing culpa adipisicing incididunt sint consectetur laborum anim',
+            description: 'Lorem labore esse labore nulla velit eu nisi nisi fugiat. Deserunt adipisicing minim laboris pariatur. Proident irure aliquip ut fugiat nisi sint eu tempor reprehenderit sunt cupidatat. Culpa ut est duis elit adipisicing mollit. Fugiat aliquip amet magna fugiat ut magna non qui adipisicing sunt id tempor pariatur. Magna labore excepteur tempor cillum dolor dolor aliquip. Ullamco exercitation veniam adipisicing qui ad.'
+        };
+
+        const newJob = await Job.create(jobData);
+
+        await Applied.deleteMany();
+        console.log("Deleted applied");
+
+        await Applied.create({
+            freelancer: newFreelancer.id,
+            job: newJob.id,
+        });
+        
+        console.log("Created applied");
+
+        const pkg = await Package.create({
+            description: '10 Posts, on top search and more',
+            point: 20,
+            canPost: 10,
+            price: 200
+        });
+
+        await TransactionHistory.create({ user: freelancerUser.id, package: pkg.id, price: 200 });
+        console.log("Created transaction");
 
     } catch (error) {
         console.log(error.message);

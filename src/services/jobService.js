@@ -6,7 +6,7 @@ const { sevenDays, thirtyDays } = require('../utils/getDays');
 class JobService {
     async getJobs(num, page) {
         
-        const jobs = await Job.find({status: true})
+        const jobs = await Job.find({status: true}).populate({ path: 'employer', populate: { path: 'user' }});
         const length = jobs.length
         if (num == null || page == null){
             return jobs

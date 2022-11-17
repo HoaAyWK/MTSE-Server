@@ -8,9 +8,9 @@ class TransactionHistoryService {
         let transactionHistories;
 
         if (num) {
-            transactionHistories = await TransactionHistory.find().limit(num);
+            transactionHistories = await TransactionHistory.find().limit(num).populate('user package');
         } else {
-            transactionHistories = await TransactionHistory.find();
+            transactionHistories = await TransactionHistory.find().populate('user package');
         }
 
         return transactionHistories;
