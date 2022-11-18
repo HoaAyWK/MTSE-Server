@@ -15,15 +15,15 @@ class EmployerController{
                     message: "Email has been taken"
                 })
             }
-    
-    
+
+
             const newUser = await userService.saveUser(req.body)
-    
+
             req.body.user = newUser._id
-    
+
             await accountService.saveAccount(req.body)
             await employerService.saveEmployer(req.body)
-    
+
             return res.status(200).json({
                 success: true,
                 message: "Register Employer Successfully"
