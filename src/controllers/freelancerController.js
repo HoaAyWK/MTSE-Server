@@ -93,6 +93,30 @@ class FreelancerController {
             })
         }
     }
+
+    async getInfo(req, res){
+        try{
+
+
+            const {id} = req.query
+
+            const freelancer = await freelancerService.getFreelancerById(id)
+
+            const user = await userService.getUserById(freelancer.user)
+
+            return res.status(200).json({
+                freelancer,
+                user
+            })
+        }
+        catch(error){
+            console.log(error)
+            return res.status(500).json({
+                success: false,
+                message: "Error Internal Server"
+            })
+        }
+    }
 }
 
 

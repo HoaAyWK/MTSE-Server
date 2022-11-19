@@ -47,13 +47,34 @@ class JobService {
         return await Job.findById(id);
     }
 
-    async getJobsByEmployer(employerId) {
+    /* async getJobsByEmployer(employerId) {
         return await Job.find({ employer: employerId });
-    }
+    } */
 
     async updateJob(id, updateBody) {
 
         return await Job.findByIdAndUpdate(id, { $set: updateBody }, { new: true, runValidators: true });
+    }
+
+    async getJobsByEmployer(employerId, status, num, page){
+        const jobs = await Job.find({employer: employerId, status})
+        if (!num || !page){
+            return jobs
+        }
+        const length = jobs.length
+
+        var start = (page-1)*num
+
+        if (start > length){
+            return []
+        }
+
+        var end = parseInt(start) + parseInt(num)
+        if (end > length){
+            end = length
+        }
+
+        return jobs.slice(start, end)
     }
 
     async changeStatus(id, status) {
