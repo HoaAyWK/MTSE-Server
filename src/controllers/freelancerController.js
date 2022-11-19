@@ -27,7 +27,7 @@ class FreelancerController {
             })
         }
         catch (error) {
-            return res.status(400).json({
+            return res.status(500).json({
                 success: false,
                 message: "Error Internal Server"
             })
@@ -55,6 +55,42 @@ class FreelancerController {
             });
         } catch (error) {
             next(error);
+        }
+    }
+
+    async editFreelancer(req, res){
+        try{
+            if (!req.userId){
+                return res.status(400).json({
+                    success: false,
+                    message: "Unauthorization"
+                })
+            }
+
+            const account = await accountService.getAccountByUserId(req.userId)
+            const freelancer = await freelancerService.getFreelancerByUserId(req.userId)
+            if (account == null || account.role != "Freelancer" || freelancer == null){
+                return res.status(400).json({
+                    success: false,
+                    message: "Unknow Freelancer"
+                })
+            }
+
+            await freelancerService.editFreelancer(freelancer.id, req.body)
+
+            return res.status(200).json({
+                success: true,
+                message: "Edit Information Successfully"
+            })
+
+           
+        }
+        catch(error){
+            console.log(error)
+            return res.status(500).json({
+                success: false,
+                message: "Error Internal Server"
+            })
         }
     }
 }

@@ -22,13 +22,20 @@ class EmployerService{
     }
 
     async handlePost(employer, handle, num){
+        console.log("Employer")
         console.log(employer)
+        console.log("NUM")
+        console.log(num)
         if (handle == true){
-            await Employer.findByIdAndUpdate(employer._id, {canPost: employer.canPost + num})
+            await Employer.findByIdAndUpdate(employer._id, { $set: {canPost: parseInt(employer.canPost) + parseInt(num)}})
         }
         else{
             await Employer.findByIdAndUpdate(employer._id, {canPost: employer.canPost - num})
         }
+    }
+
+    async editEmployer(employerId, employerData){
+        await Employer.findByIdAndUpdate(employerId, {companyName: employerData.companyName, companySize: employerData.companySize, info: employerData.info, updatedAt: Date.now()})
     }
 
     async countEmployer() {
