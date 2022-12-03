@@ -39,6 +39,7 @@ class AppliedController{
             req.body.freelancer = freelancer.id
 
             const job = await jobService.getJobById(req.body.job) 
+            console.log(job)
             if (job == null || job.status == false || job.expireDate < Date.now()){
                 return res.status(400).json({
                     success: false,

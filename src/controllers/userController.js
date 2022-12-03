@@ -36,7 +36,7 @@ class UserController{
         try {
             const user = await userService.updateUser(req.userId, req.body);
             const account = await accountService.getAccountByUserId(req.userId);
-
+            console.log(user)
             if (!account) {
                 throw new ApiError(400, 'Account not found');
             }
