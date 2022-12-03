@@ -1,20 +1,24 @@
 require('dotenv').config();
 const http = require('http');
 const { v4: uuidv4 } = require('uuid');
-const Redis = require("ioredis");
+// const Redis = require("ioredis");
 
 
-const redisClient = new Redis();
+// const redisClient = new Redis();
 const app = require('./app');
 const { connectDatabase } = require('./config/database');
-const { RedisMessageStore } = require('./utils/messageStore');
-const { RedisSessionStore } = require('./utils/sessionStore');
+const { RedisMessageStore, InMemoryMessageStore } = require('./utils/messageStore');
+const { RedisSessionStore, InMemorySessionStore } = require('./utils/sessionStore');
 
 const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
 const origin = "http://localhost:3000";
-const sessionStore = new RedisSessionStore(redisClient);
-const messageStore = new RedisMessageStore(redisClient);
+
+// const sessionStore = new RedisSessionStore(redisClient);
+// const messageStore = new RedisMessageStore(redisClient);
+
+const sessionStore = new InMemorySessionStore();
+const messageStore = new InMemoryMessageStore();
 
 const io = require("socket.io")(server, {
     cors: {
