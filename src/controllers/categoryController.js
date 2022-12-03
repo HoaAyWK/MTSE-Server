@@ -44,6 +44,21 @@ class CategoryController {
         }
     }
 
+    async getCategoriesWithCount(req, res, next) {
+        try {
+            const categories = await categoryService.getCategories(4, 1);
+            const jobsPerCategory = await categoryJobService.countJobsByCategory();
+
+            res.status(200).json({
+                success: true,
+                categories,
+                jobsPerCategory,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async createCategory(req, res, next) {
         try {
             const userId = req.userId;

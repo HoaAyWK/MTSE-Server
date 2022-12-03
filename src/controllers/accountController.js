@@ -1,6 +1,7 @@
 const accountService = require('../services/accountService')
 const userService = require('../services/userService')
 const jwtFilter = require('../middleware/jwtFilter')
+const getStreamService = require('../services/getStreamService');
 
 class AccountController {
     async loginAccount(req, res) {
@@ -36,16 +37,20 @@ class AccountController {
                     message: "Invalid Email or Password"
                 })
             }
+            
+            const streamToken = getStreamService.getStreamToken(user.id);
 
             const accessToken = jwtFilter.generateToken(user._id)
 
             return res.status(200).json({
                 success: true,
+                streamToken,
                 message: "Login Successfully",
                 accessToken
-            })
+            });
         }
         catch(error){
+            console.log(error);
             return res.status(500).json({
                 success: false,
                 message: "Error Internal Server"

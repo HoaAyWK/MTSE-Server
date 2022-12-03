@@ -206,6 +206,19 @@ class AppliedController{
             next(error);
         }
     }
+
+    async getAppliedsByJob(req, res, next) {
+        try {
+            const applieds = await appliedService.getAppliedsByJobForAdmin(req.params.job);
+
+            res.status(200).json({
+                sucess: true,
+                applieds
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new AppliedController

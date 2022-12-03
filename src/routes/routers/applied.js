@@ -7,5 +7,6 @@ router.post('/add', jwtFilter.verifyToken, appliedController.addApply)
 router.delete('/cancel/:job', jwtFilter.verifyToken, appliedController.cancelApplied)
 router.get('/myJob/:job', jwtFilter.verifyToken, appliedController.getAppliedByJob)
 router.get('/admin/:job', jwtFilter.verifyToken, appliedController.getAppliedsByJobForAdmin);
+router.get('/jobs/:job', jwtFilter.verifyToken, appliedController.getAppliedsByJob);
 
 module.exports = router

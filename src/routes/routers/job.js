@@ -11,4 +11,6 @@ router.get('/category/:id', jobController.getJobs)
 router.get('/myJobs',jwtFilter.verifyToken, jobController.getMyJobs)
 router.put('/status/:id', jwtFilter.verifyToken, jobController.changeStatus)
 
+router.get('/my', jwtFilter.verifyToken, jobController.getMyJobs);
+
 module.exports = router

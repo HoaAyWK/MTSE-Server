@@ -1,3 +1,4 @@
+const { ROLES } = require('../constants/constants');
 const { userService, accountService } = require('../services');
 const employerService = require('../services/employerService');
 const freelancerService = require('../services/freelancerService');
@@ -15,6 +16,8 @@ class UserController{
             const user = await userService.getUserById(req.userId)
             const employer = await employerService.getEmployerByUserId(req.userId)
             const freelancer = await freelancerService.getFreelancerByUserId(req.userId)
+            const account = await accountService.getAccountByUserId(req.userId)
+            user._doc.role = account.role;
 
             return res.status(200).json({
                 success: true,
