@@ -5,6 +5,7 @@ const employerService = require('../services/employerService')
 const { calTotalPages } = require('../utils/page')
 const categoryJobService = require('../services/categoryJobService')
 const categoryService = require('../services/categoryService')
+const ApiError = require('../utils/ApiError')
 
 
 class JobController{
@@ -265,6 +266,26 @@ class JobController{
                 success: false,
                 message: "Internal Error Server"
             })
+        }
+    }
+
+
+    async getMyJobs(req, res, next) {
+        try {
+            const employer = await employerService.getEmployerByUserId(req.userId);
+
+            if (!employer) {
+                throw new ApiError(403, 'You are not the owner of these jobs');
+            }
+
+            const jobs = await jobService.getJobsByEmployer(employer.id);
+
+            res.status(200).json({
+                success: true,
+                jobs
+            });
+        } catch (error) {
+            next(error)
         }
     }
 }

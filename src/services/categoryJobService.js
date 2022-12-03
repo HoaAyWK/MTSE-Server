@@ -7,6 +7,36 @@ class JobCategoryService {
         return await CategoryJob.find();
     }
 
+    async countJobsByCategory() {
+        
+        const countJobs = await CategoryJob.aggregate([
+            {
+                $lookup: {
+                    from: 'jobs',
+                    localField: 'job',
+                    foreignField: '_id',
+                    as: 'job'
+                },
+            },
+            {
+                $match: {
+                    'job.expireDate': { $gte: new Date() }
+                }
+            },
+            {
+                $group: {
+                    _id: { category: '$category' },
+                    count: { '$sum': 1 },
+                }
+            }
+        ]);
+
+        const jobsPerCategory = {};
+        countJobs.forEach((category) => jobsPerCategory[category._id.category] = category.count);
+
+        return jobsPerCategory;
+    }
+
 
     async getCategoryJobsByCategory(categoryId) {
         return await CategoryJob.find({ category: categoryId });

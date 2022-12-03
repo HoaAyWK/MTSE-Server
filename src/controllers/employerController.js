@@ -19,7 +19,7 @@ class EmployerController{
 
             const newUser = await userService.saveUser(req.body)
 
-            req.body.user = newUser._id
+            req.body.user = newUser.id
 
             await accountService.saveAccount(req.body)
             await employerService.saveEmployer(req.body)

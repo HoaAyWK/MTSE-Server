@@ -1,4 +1,7 @@
+const { ROLES } = require('../constants/constants');
 const { userService, accountService } = require('../services');
+const employerService = require('../services/employerService');
+const freelancerService = require('../services/freelancerService');
 const ApiError = require('../utils/ApiError');
 
 class UserController{
@@ -17,6 +20,22 @@ class UserController{
             }
 
             user._doc.role = account.role;
+
+            if (account.role === ROLES.FREELANCER) {
+                const freelancer = await freelancerService.getFreelancerByUserId(req.userId);
+
+                if (freelancer) {
+                    user._doc.freelancer = freelancer;
+                }
+            }
+
+            if (account.role === ROLES.EMPLOYER) {
+                const employer = await employerService.getEmployerByUserId(req.userId);
+
+                if (employer) {
+                    user._doc.employer = employer;
+                }
+            }
 
             res.status(200).json({
                 success: true,

@@ -6,6 +6,7 @@ const jwtFilter = require('../../middleware/jwtFilter');
 const router = Router();
 
 router.get('/', categoryController.getCategories);
+router.get('/all', categoryController.getCategoriesWithCount);
 
 router.post('/admin/create', jwtFilter.verifyToken, categoryController.createCategory);
 
