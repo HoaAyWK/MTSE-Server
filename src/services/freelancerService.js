@@ -9,6 +9,10 @@ class FreelancerService{
         return newFreelancer
     }
 
+    async editFreelancer(freelancerId, freelancerData){
+        await Freelancer.findByIdAndUpdate(freelancerId, {firstName: freelancerData.firstName, lastName: freelancerData.lastName, gender: freelancerData.gender})
+    }
+
     async getFreelancerByUserId(userId){
         return await Freelancer.findOne({user: userId})
     }

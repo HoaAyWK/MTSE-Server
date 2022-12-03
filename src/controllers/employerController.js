@@ -31,7 +31,7 @@ class EmployerController{
         }
         catch(error){
             console.log(error)
-            return res.status(400).json({
+            return res.status(500).json({
                 success: false,
                 message: "Internal Error Server"
             })
@@ -61,6 +61,43 @@ class EmployerController{
             next(error);
         }
     }
+
+    async editEmployer(req, res){
+        try{
+            if (!req.userId){
+                return res.status(400).json({
+                    success: false,
+                    message: "Unauthorization"
+                })
+            }
+
+            const account = await accountService.getAccountByUserId(req.userId)
+            const employer = await employerService.getEmployerByUserId(req.userId)
+            if (account == null || account.role != "Employer" || employer == null){
+                return res.status(400).json({
+                    success: false,
+                    message: "Unknow Employer"
+                })
+            }
+
+            await employerService.editEmployer(employer.id, req.body)
+
+            return res.status(200).json({
+                success: true,
+                message: "Edit Information Successfully"
+            })
+
+        }
+        catch(error){
+            return res.status(500).json({
+                success: false,
+                message: "Internal Error Server"
+            })
+        }
+    }
+
+
+    
 }
 
 module.exports = new EmployerController

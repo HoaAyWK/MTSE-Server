@@ -6,7 +6,7 @@ const { calTotalPages } = require('../utils/page')
 const categoryJobService = require('../services/categoryJobService')
 const categoryService = require('../services/categoryService')
 const ApiError = require('../utils/ApiError')
-
+const appliedService = require('../services/appliedService')
 
 class JobController{
     async createJob(req, res){
@@ -73,6 +73,55 @@ class JobController{
         }
     }
 
+    async getMyJobs(req, res){
+        try{
+            var {num, page, status} = req.query
+            if (parseInt(status) != 1){
+                status = false
+            }
+            else{
+                status = true
+            }
+            const employer = await employerService.getEmployerByUserId(req.userId)
+            if (employer == null){
+                return res.status(400).json({
+                    success: false,
+                    message: "You are not employer"
+                })
+            }
+            const jobs = await jobService.getJobsByEmployer(employer.id, status, num, page)
+            var applies = []
+            var categoriesJobs = []
+            for (var i=0; i<jobs.length; i++){
+                const applieds = await appliedService.getAppliedByJob(jobs[i].id, null, null)
+                const categories = await categoryJobService.getCategoriesByJob(jobs[i].id)
+                var temp = []
+                for (var j=0; j<categories.length; j++){
+                    const category = await categoryService.getCategoryById(categories[i].id)
+                    temp.push(category)
+                }
+                categoriesJobs.push(temp)
+                applies.push(applieds.length)
+            }
+            const allJobs = await jobService.getJobsByEmployer(employer.id, status, null, null)
+            return res.status(200).json({
+                message: "OK",
+                jobs,
+                length: allJobs.length,
+                totalPages: calTotalPages(num, allJobs.length),
+                applies,
+                categories: categoriesJobs
+            })
+        }
+        catch(error){
+            console.log(error)
+            return res.status(500).json({
+                success: false,
+                message: "Error Internal Server"
+            })
+        }
+    }
+
     async getJobById(req, res){
         try{
             if (!req.query.id){
@@ -113,8 +162,23 @@ class JobController{
             const jobs = await jobService.getJobs(num, page)
             const length = await jobService.getNumOfJobs()
 
+            var categoriesJobs = []
+
+            for (var i=0; i<jobs.length; i++){
+                const categories = await categoryJobService.getCategoriesByJob(jobs[i].id)
+                var temp = []
+                for (var j=0; j<categories.length; j++){
+                    const category = await categoryService.getCategoryById(categories[j].category)
+                    temp.push(category)
+                }
+                categoriesJobs.push(temp)
+            }
+
+            console.log(categoriesJobs)
+
             return res.status(200).json({
                 jobs,
+                categories: categoriesJobs,
                 length,
                 totalPages: calTotalPages(num, length)
             })

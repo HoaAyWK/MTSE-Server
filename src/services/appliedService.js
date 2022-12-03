@@ -33,6 +33,9 @@ class AppliedService {
 
     async getAppliedByJob(jobId, num, page){
         const allApplied = await Applied.find({job: jobId, status:true})
+        if (!num || !page){
+            return allApplied
+        }
         const length = allApplied.length
         var start = (page - 1)*num
         if (start > length){

@@ -119,6 +119,124 @@ class SearchController{
             })
         }
     }
+
+    async getFreelancersBySkills(req, res){
+        try{
+            // freelancer and employers
+            var {skills} = req.body
+
+            /* skillsSearch = skillsSearch.concat(skills)
+            skills = []
+            skillsSearch.forEach(item => {
+                if (!skills.includes(item)){
+                    skills.push(item)
+                }
+            }) */
+
+            var result = []
+            for (var i=0; i<skills.length; i++){
+                var userInfo = await userSkillService.getUsersBySkill(skills[i])
+                result = result.concat(userInfo)
+            }
+
+            var freelancers = []
+            for (var i=0; i < result.length; i++){
+                var temp
+                temp = result[i]
+                if (i == 0 || JSON.stringify(result[i].user) != JSON.stringify(result[i-1].user)){
+                    var freelancer = await freelancerService.getFreelancerByUserId(result[i].user)
+                    if (freelancer){
+                        freelancers.push(freelancer)
+                    }
+                }
+            }
+
+            return res.status(200).json({
+                freelancers
+            })
+        }
+        catch(error){
+            console.log(error)
+            return res.status(500).json({
+                message: "Internal Error Server"
+            })
+        }
+    }
+
+    async getEmployersBySkills(req, res){
+        try{
+            // freelancer and employers
+            var {skills} = req.body
+
+            /* skillsSearch = skillsSearch.concat(skills)
+            skills = []
+            skillsSearch.forEach(item => {
+                if (!skills.includes(item)){
+                    skills.push(item)
+                }
+            }) */
+
+            var result = []
+            for (var i=0; i<skills.length; i++){
+                var userInfo = await userSkillService.getUsersBySkill(skills[i])
+                result = result.concat(userInfo)
+            }
+
+            var employers = []
+            for (var i=0; i < result.length; i++){
+                var temp
+                temp = result[i]
+                if (i == 0 || JSON.stringify(result[i].user) != JSON.stringify(result[i-1].user)){
+                    var employer = await employerService.getEmployerByUserId(result[i].user)
+                    if (employer){
+                        employers.push(employer)
+                    }
+                }
+            }
+
+            return res.status(200).json({
+                employers
+            })
+        }
+        catch(error){
+            console.log(error)
+            return res.status(500).json({
+                message: "Internal Error Server"
+            })
+        }
+    }
+
+    async getJobsByCategories(req, res){
+        try{
+            // jobs
+            var {categories} = req.body
+            var result = []
+            for (var i=0; i<categories.length; i++){
+                var jobsInfo = await categoryJobService.getCategoryJobsByCategory(categories[i])
+                result = result.concat(jobsInfo)
+            }
+            var jobs = []
+            for (var i=0; i<result.length; i++){
+                var temp = result[i]
+                if (i ==0 || JSON.stringify(result[i].job) != JSON.stringify(result[i-1].job)){
+                    var job = await jobService.getJobById(temp.job)
+                    jobs.push(job)
+                }
+                else{
+                    continue
+                }
+            }
+
+            return res.status(200).json({jobs})
+            
+        }
+        catch(error){
+            console.log(error)
+            return res.status(500).json({
+                message: "Internal Error Server"
+            })
+        }
+    }
 }
 
 module.exports = new SearchController
