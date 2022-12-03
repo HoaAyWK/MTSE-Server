@@ -5,7 +5,7 @@ const jwtFilter = require('../../middleware/jwtFilter');
 
 const router = Router();
 
-router.get('/', skillController.getSkills);
+router.get('/show', skillController.getSkills);
 
 router.post('/admin/create', jwtFilter.verifyToken, skillController.createSkill);
 

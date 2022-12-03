@@ -3,6 +3,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const ApiError = require('../utils/ApiError');
 const { packageService } = require('../services');
 const transactionHistoryService = require("../services/transactionHistoryService");
+const employerService = require('../services/employerService')
 
 class CheckoutController {
     async checkoutWithStripe(req, res, next) {
@@ -68,13 +69,30 @@ class CheckoutController {
         
             switch (event.type) {
                 case "checkout.session.completed":
-                    const { user_id, package_id } = event.data.object.metadata;       
-                    
-                    await transactionHistoryService.createTransactionHistory({ user: user_id, package: package_id });
+                    try{
+                        const { user_id, package_id } = event.data.object.metadata;  
+                        const employer = await employerService.getEmployerByUserId(user_id)
+                        //console.log(employer)
+                        if (!employer){
+                            console.log("employer bug")
+                        }
+                        const pkg = await packageService.getPackageById(package_id)   
+                        //console.log(pkg)
 
+                        if (!pkg){
+                            console.log("package bug")
+                        }
+                        await employerService.handlePost(employer, true, pkg.canPost)
+                        await transactionHistoryService.createTransactionHistory({ user: user_id, package: package_id });
+    
+                    }
+                    catch(error){
+                        console.log(error)
+                    }
+                    
                     break;
                 default:
-                    console.log(`Unhandled event type ${event.type}.`);
+                    //console.log(`Unhandled event type ${event.type}.`);
             }
 
 

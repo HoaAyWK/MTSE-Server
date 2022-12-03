@@ -5,6 +5,7 @@ const jobService = require('../services/jobService')
 const freelancerService = require('../services/freelancerService')
 const employerService = require('../services/employerService')
 const { ROLES } = require('../constants/constants'); 
+const { calTotalPages } = require('../utils/page');
 
 class AppliedController{
     async addApply(req, res){
@@ -162,7 +163,7 @@ class AppliedController{
             }
 
             const applied = await appliedService.getAppliedByJob(req.params.job, num, page)
-
+            const allApplies = await appliedService.getAppliedByJob(req.params.job, null, null)
             for (var i=0; i<applied.length; i++){
                 var freelancer = await freelancerService.getFreelancerById(applied[i].freelancer)
                 applied[i].freelancer = freelancer
@@ -171,7 +172,9 @@ class AppliedController{
             return res.status(200).json({
                 applies: applied,
                 job,
-                employer
+                employer,
+                length: allApplies.length,
+                totalPages: calTotalPages(num, allApplies.length)
             })
             
         }
