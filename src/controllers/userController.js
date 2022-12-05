@@ -34,7 +34,7 @@ class UserController{
 
     async updateUser(req, res, next) {
         try {
-            if (req.userId){
+            if (!req.userId){
                 return res.status(400).json({
                     success: false,
                     message: "Unauthorization"
