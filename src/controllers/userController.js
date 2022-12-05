@@ -37,21 +37,35 @@ class UserController{
 
     async updateUser(req, res, next) {
         try {
-            const user = await userService.updateUser(req.userId, req.body);
-            const account = await accountService.getAccountByUserId(req.userId);
-
-            if (!account) {
-                throw new ApiError(400, 'Account not found');
+            if (!req.userId){
+                return res.status(400).json({
+                    success: false,
+                    message: "Unauthorization"
+                })
             }
 
-            user._doc.role = account.role;
+            const user = await userService.getUserById(req.userId)
+            if (!user){
+                return res.status(400).json({
+                    success: false,
+                    message: "User not Found"
+                })
+            }
 
-            res.status(200).json({
-                success: true,
-                user
-            });
+            const account = await accountService.getAccountByUserId(req.userId)
+            if (!account){
+                return res.status(400).json({
+                    success: false,
+                    message: "User not Found"
+                })
+            }
+
+            await userService.updateUser(req.userId, req.body)
         } catch (error) {
-            next(error);
+            return res.status(500).json({
+                success: false,
+                message: "Error Internal Server"
+            })
         }
     }
 
