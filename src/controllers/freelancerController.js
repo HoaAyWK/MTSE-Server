@@ -6,7 +6,6 @@ const skillService = require('../services/skillService')
 const commentService = require('../services/commentService')
 const ApiError = require('../utils/ApiError')
 const { ROLES, MESSAGE_ERRORS } = require('../constants/constants')
-const { userSkillService } = require('../services')
 
 class FreelancerController {
     async registerFreelancer(req, res) {
