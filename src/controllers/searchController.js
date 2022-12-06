@@ -5,6 +5,7 @@ const freelancerService = require('../services/freelancerService')
 const employerService = require('../services/employerService')
 const categoryService = require('../services/categoryService')
 const skillService = require('../services/skillService')
+const pick = require('../utils/pick');
 
 class SearchController{
     async search(req, res){
@@ -13,6 +14,9 @@ class SearchController{
             var {content} = req.body
             console.log("Content search")
             console.log(content)
+            if (!content) {
+                content = ' ';
+            }
             content = content.toLowerCase()
             var content_arr = content.split(' ')
 
@@ -45,7 +49,7 @@ class SearchController{
 
             categoriesSearch = categoriesSearch.concat(categories)
             categories = []
-            categoriesSearch.forEach(item => {
+            categoriesSearch.forEach((item) => {
                 if (!categories.includes(item)){
                     categories.push(item)
                 }
@@ -54,16 +58,17 @@ class SearchController{
             
 
             var result = []
-            for (var i=0; i<categories.length; i++){
-                var jobsInfo = await categoryJobService.getCategoryJobsByCategory(categories[i])
+            for (var i=0; i< categories.length; i++){
+                var jobsInfo = await categoryJobService.getCategoryJobsByCategory(categories[i]);
                 result = result.concat(jobsInfo)
             }
             var jobs = []
             for (var i=0; i<result.length; i++){
                 if (i ==0 || JSON.stringify(result[i].job) != JSON.stringify(result[i-1].job._id)){
                     var job = await jobService.getJobById(result[i].job)
-
+                    var category = await categoryService.getCategoryById(result[i].category);
                     result[i].job = job
+                    result[i].category = category;
                     jobs.push(result[i])
                 }
                 else{
@@ -235,6 +240,57 @@ class SearchController{
             return res.status(500).json({
                 message: "Internal Error Server"
             })
+        }
+    }
+
+
+    async searchJobs(req, res, next) {
+        try { 
+            const filter = pick(req.query, ['name', 'price']);
+            const options = pick(req.query, ['sortBy']);
+            const { categories: filterByCategories, company, limit, page } = req.query;
+            const jobs = await jobService.queryJobs(filter, options);
+            const jobIds = jobs.map((item) => item._id);
+
+            if (company) {
+                const jobsByEmployer = await jobService.getJobsByEmployerName(company);
+
+                for (let job of jobsByEmployer) {
+                    if (!jobIds.includes(job._id)) {
+                        jobs.push(job);
+                    }
+                }
+            }
+
+            const totalPage = Math.ceil(jobs.length / limit);
+
+            const skip = limit * (page - 1);
+            const take = skip + limit;
+
+            let data = [];
+
+            if (jobs.length < limit) {
+                data = jobs;
+            } else {
+                data = jobs.slice(skip, take);
+            }
+
+            for (let job in data) {
+                const categories = await categoryJobService.getCategoriesByJob(data[job]._id);
+                data[job].categories = categories;
+            }
+
+            // console.log(data);
+
+            res.status(200).json({
+                data,
+                limit,
+                page,
+                totalPage,
+                totalItem: jobs.length
+            });
+        } catch (error) {
+            next(error);
         }
     }
 }

@@ -59,7 +59,7 @@ class JobCategoryService {
     }
 
     async getCategoriesByJob(jobId){
-        return await CategoryJob.find({job: jobId})
+        return await CategoryJob.find({job: jobId}).populate('category').lean();
     }
 
     async updateCategoryJob(id, updateBody) {

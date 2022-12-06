@@ -7,4 +7,6 @@ router.post('/', searchController.search)
 router.post('/freelancer', searchController.getFreelancersBySkills)
 router.post('/employer', searchController.getEmployersBySkills)
 router.post('/job', searchController.getJobsByCategories)
+router.get('/jobs', searchController.searchJobs);
+
 module.exports = router

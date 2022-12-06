@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { JOB_STATUS } = require('../constants/constants');
 const Schema = mongoose.Schema;
 
-const { toJSON } = require('./plugins');
+const { toJSON, paginate } = require('./plugins');
 
 const jobSchema = new Schema({
     name: {
@@ -38,6 +38,7 @@ const jobSchema = new Schema({
 }, { timestamps: true });
 
 jobSchema.plugin(toJSON);
+jobSchema.plugin(paginate);
 
 const Job = mongoose.model('Job', jobSchema);
 

@@ -26,7 +26,7 @@ class CategoryService {
 
 
     async getCategoriesInfo(info){
-        return await Category.find({name: {$regex: info, $options: "i"}})
+        return await Category.find({name: {$regex: info, $options: "i"}});
     }
 
 
@@ -63,6 +63,8 @@ class CategoryService {
 
         await category.remove();
     }
+
+    
 }
 
 

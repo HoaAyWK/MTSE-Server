@@ -37,7 +37,6 @@ class FreelancerController {
         }
     }
 
-
     async getFreelancers(req, res, next) {
         try {
             /* const account = await accountService.getAccountByUserId(req.userId);

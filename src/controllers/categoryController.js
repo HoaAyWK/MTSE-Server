@@ -148,6 +148,21 @@ class CategoryController {
             next(error);
         }
     }
+
+    async getCategoriesWithCount(req, res, next) {
+        try {
+            const categories = await categoryService.getCategories(4, 1);
+            const jobsPerCategory = await categoryJobService.countJobsByCategory();
+
+            res.status(200).json({
+                success: true,
+                categories,
+                jobsPerCategory,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new CategoryController;

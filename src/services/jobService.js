@@ -2,11 +2,12 @@ const ApiError = require('../utils/ApiError');
 const { Job } = require('../models');
 const twentyFourHours = require('../utils/get24Hours');
 const { sevenDays, thirtyDays } = require('../utils/getDays');
+const { toJSON } = require('../models/plugins');
 
 class JobService {
     async getJobs(num, page) {
         
-        const jobs = await Job.find({status: true}).populate({ path: 'employer', populate: { path: 'user' }});
+        const jobs = await Job.find({status: true}).populate({ path: 'employer', populate: { path: 'user' }}).sort('-createdAt');
         const length = jobs.length
         if (num == null || page == null){
             return jobs
@@ -191,6 +192,50 @@ class JobService {
         }
 
         return daysObj;
+    }
+
+    async queryJobs(filter, options) {
+        let sort = "";
+
+        if (options.sortBy) {
+            const sortingCriteria = [];
+            options.sortBy.split(",").forEach((sortOption) => {
+                const [key, order] = sortOption.split(":");
+
+                sortingCriteria.push((order === "desc" ? "-" : "") + key);
+            });
+
+            sort = sortingCriteria.join(" ");
+        } else {
+            sort = "createdAt";
+        }
+
+        return  await Job.find(filter).sort(sort).lean().populate('employer');
+    }
+
+    async getJobsByEmployerName(name) {
+        return await Job.aggregate([
+            {
+                $lookup: {
+                    'from': 'employers',
+                    'localField': 'employer',
+                    'foreignField': '_id',
+                    'as': 'employer'
+                }
+            },
+            {
+                $unwind: {
+                    'path': '$employer'
+                }
+            },
+            {
+                '$match': {
+                    'employer.companyName': {
+                        $regex: name, $options: 'i'
+                    }
+                }
+            }
+        ]);
     }
 }
 
