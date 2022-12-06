@@ -6,6 +6,6 @@ const jwtFilter = require('../../middleware/jwtFilter');
 router.get('/info', freelancerController.getInfo)
 router.post('/register', freelancerController.registerFreelancer)
 router.put('/edit' ,jwtFilter.verifyToken, freelancerController.editFreelancer)
-router.get('/', jwtFilter.verifyToken, freelancerController.getFreelancers);
+router.get('/', freelancerController.getFreelancers);
 
 module.exports = router
