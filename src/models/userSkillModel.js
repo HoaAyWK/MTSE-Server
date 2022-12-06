@@ -12,7 +12,7 @@ const userSkillSchema = new Schema({
     skill: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: 'skill'
+        ref: 'Skill'
     },
 });
 
