@@ -1,5 +1,5 @@
 const { ROLES } = require('../constants/constants');
-const { userService, accountService } = require('../services');
+const { userService, accountService, userSkillService } = require('../services');
 const employerService = require('../services/employerService');
 const freelancerService = require('../services/freelancerService');
 const ApiError = require('../utils/ApiError');
@@ -17,13 +17,15 @@ class UserController{
             const employer = await employerService.getEmployerByUserId(req.userId)
             const freelancer = await freelancerService.getFreelancerByUserId(req.userId)
             const account = await accountService.getAccountByUserId(req.userId)
+            const userSkills = await userSkillService.getUserSkillsByUser(req.userId);
             user._doc.role = account.role;
 
             return res.status(200).json({
                 success: true,
                 user,
                 employer,
-                freelancer
+                freelancer,
+                userSkills,
             })
         }
         catch(error){
@@ -42,6 +44,25 @@ class UserController{
 
             if (!account) {
                 throw new ApiError(400, 'Account not found');
+            }
+
+            const skills = req.body.skills;
+
+            if (skills && skills.length > 0) {
+                const userSkills = await userSkillService.getUserSkillsByUser(req.userId);
+
+                for (let uk of userSkills) {
+                    if (!skills.includes(uk.skill)) {
+                        await userSkillService.deleteuserSkill(uk.id);
+                    }
+                }
+
+                for (let skill of skills) {
+                    const userSkill = await userSkillService.getUserSkillByUserAndSkill(req.userId, skill);
+                    if (!userSkill) {
+                        await userSkillService.createUserSkill({ user: req.userId, skill });
+                    }
+                }
             }
 
             user._doc.role = account.role;

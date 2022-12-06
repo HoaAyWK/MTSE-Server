@@ -14,6 +14,10 @@ class UserSkillService {
         return userSkills;
     }
 
+    async getUserSkillByUserAndSkill(userId, skillId) {
+        return await UserSkill.findOne({ user: userId, skill: skillId });
+    }
+
     async getUsersBySkill(skillId){
         return await UserSkill.find({skill: skillId})
     }
@@ -28,7 +32,7 @@ class UserSkillService {
 
     async getUserSkillsByUser(userId) {
         return await UserSkill.find({ user: userId })
-            .populate('user skill')
+            .populate('skill')
     }
 
     async countUserSkillsBySkill(skillId) {
