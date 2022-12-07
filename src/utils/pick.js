@@ -7,7 +7,7 @@
  const pick = (object, keys) => {
     return keys.reduce((obj, key) => {
         if (object && Object.prototype.hasOwnProperty.call(object, key)) {
-            if (key === 'name') {
+            if (key === 'name' || key === 'firstName' || key === 'lastName' || key === 'companyName') {
                 console.log(object[key])
                 if (object[key]) {
                     obj[key] = {

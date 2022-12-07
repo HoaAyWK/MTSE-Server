@@ -293,6 +293,70 @@ class SearchController{
             next(error);
         }
     }
+
+    async searchFreelancers(req, res, next) {
+        try {
+            const filter = pick(req.query, ['firstName', 'lastName']);
+            const options = pick(req.query, ['sortBy']);
+            const { limit, page } = req.query;
+            const freelancers = await freelancerService.queryFreelancers(filter, options);
+
+            const totalPage = Math.ceil(freelancers.length / limit);
+
+            const skip = limit * (page - 1);
+            const take = skip + limit;
+
+            let data = [];
+
+            if (freelancers.length < limit) {
+                data = freelancers;
+            } else {
+                data = freelancers.slice(skip, take);
+            }
+
+            res.status(200).json({
+                data,
+                limit,
+                page,
+                totalPage,
+                totalItem: freelancers.length
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async searchEmployers(req, res, next) {
+        try {
+            const filter = pick(req.query, ['companyName']);
+            const options = pick(req.query, ['sortBy']);
+            const { limit, page } = req.query;
+            const employers = await employerService.queryEmployers(filter, options);
+
+            const totalPage = Math.ceil(employers.length / limit);
+
+            const skip = limit * (page - 1);
+            const take = skip + limit;
+
+            let data = [];
+
+            if (employers.length < limit) {
+                data = employers;
+            } else {
+                data = employers.slice(skip, take);
+            }
+
+            res.status(200).json({
+                data,
+                limit,
+                page,
+                totalPage,
+                totalItem: employers.length
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new SearchController

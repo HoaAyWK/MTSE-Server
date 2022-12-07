@@ -28,6 +28,25 @@ class FreelancerService{
     async countFreelancer() {
         return await Freelancer.count();
     }
+
+    async queryFreelancers(filter, options) {
+        let sort = "";
+
+        if (options.sortBy) {
+            const sortingCriteria = [];
+            options.sortBy.split(",").forEach((sortOption) => {
+                const [key, order] = sortOption.split(":");
+
+                sortingCriteria.push((order === "desc" ? "-" : "") + key);
+            });
+
+            sort = sortingCriteria.join(" ");
+        } else {
+            sort = "createdAt";
+        }
+
+        return  await Freelancer.find(filter).sort(sort).lean().populate('user');
+    }
 }
 
 module.exports = new FreelancerService
