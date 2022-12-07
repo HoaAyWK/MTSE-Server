@@ -166,6 +166,39 @@ class CommentController{
         }
     }
 
+    async getCommentsOfObject(req, res){
+        try{
+            const {id} = req.query
+            if (!id){
+                return res.status(400).json({
+                    success: false,
+                    message: "Unknow"
+                })
+            }
+            const postedComments = await commentService.getCommentsBySender(id)
+            const isPostedComments = await commentService.getCommentsByReceiver(id)
+
+            for (var i =0; i<postedComments.length; i++){
+                var user = await userService.getUserById(postedComments[i].receiver)
+                postedComments[i].receiver = user
+            }
+
+            for (var i =0; i<isPostedComments.length; i++){
+                var user = await userService.getUserById(isPostedComments[i].sender)
+                isPostedComments[i].sender = user
+            }
+
+            return res.status(200).json({
+                postedComments,
+                isPostedComments
+            })
+
+        }
+        catch(error){
+
+        }
+    }
+
 }
 
 module.exports = new CommentController
