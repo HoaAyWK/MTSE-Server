@@ -96,7 +96,31 @@ class EmployerController{
         }
     }
 
+    async getEmployerById(req, res){
+        try{
+            const {id} = req.query
+            if (!id){
+                return res.status(400).json({
+                    success: false,
+                    message: "Unknow Employer"
+                })
+            }
+            
+            const employer = await employerService.getEmployerById(id)
+            const user = await userService.getUserById(employer.user)
+            employer.user = user
 
+            return res.status(200).json({
+                employer
+            })
+        }
+        catch(error){
+            return res.status(500).json({
+                success: false,
+                message: "Internal Error Server"
+            })
+        }
+    }
     
 }
 

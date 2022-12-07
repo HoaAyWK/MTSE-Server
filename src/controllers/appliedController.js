@@ -220,6 +220,42 @@ class AppliedController{
             next(error);
         }
     }
+
+    async checkApplied(req, res){
+        try{
+            const job = req.params.job
+            if (!req.userId || !job){
+                return res.status(400).json({
+                    result: -1,
+                    message: "Unauthorization"
+                })
+            }
+            const freelancer = await freelancerService.getFreelancerByUserId(req.userId)
+            if (!freelancer){
+                return res.status(400).json({
+                    result: -1,
+                    message: "Unauthorized Freelancer"
+                })
+            }
+
+            const apply = await appliedService.getAppliedByFreelancerAndJob(freelancer.id, job)
+            if (apply){
+                return res.status(400).json({
+                    result: 1,
+                    message: "Applied"
+                })
+            }
+            return res.status(400).json({
+                result: 0
+            })
+        }
+        catch(error){
+            return res.status(500).json({
+                result: -1,
+                message: "Internal Error Server"
+            })
+        }
+    }
 }
 
 module.exports = new AppliedController

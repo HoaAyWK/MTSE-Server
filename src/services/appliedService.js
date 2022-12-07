@@ -80,7 +80,10 @@ class AppliedService {
 
         await applied.remove();
     }
-}
 
+    async getAppliedByJobAndFreelancer(job, freelancer){
+        return await Applied.findOne({job, freelancer})
+    }
+}
 
 module.exports = new AppliedService;

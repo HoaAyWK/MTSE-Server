@@ -114,8 +114,6 @@ class FreelancerController {
 
     async getInfo(req, res){
         try{
-
-
             const {id} = req.query
 
             const freelancer = await freelancerService.getFreelancerById(id)
