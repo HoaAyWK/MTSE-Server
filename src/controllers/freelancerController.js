@@ -6,6 +6,7 @@ const skillService = require('../services/skillService')
 const commentService = require('../services/commentService')
 const ApiError = require('../utils/ApiError')
 const { ROLES, MESSAGE_ERRORS } = require('../constants/constants')
+const getStreamService = require('../services/getStreamService')
 
 class FreelancerController {
     async registerFreelancer(req, res) {
@@ -94,7 +95,14 @@ class FreelancerController {
                 })
             }
 
-            await freelancerService.editFreelancer(freelancer.id, req.body)
+            const upadtedFreelancer = await freelancerService.editFreelancer(freelancer.id, req.body)
+
+            // if (upadtedFreelancer) {
+            //     const { firstName, lastName } = req.body;
+            //     const name = firstName + ' ' + lastName;
+            //     await getStreamService.updateUserName(req.userId, name)
+            // }
+            
 
             return res.status(200).json({
                 success: true,
@@ -109,6 +117,34 @@ class FreelancerController {
                 success: false,
                 message: "Error Internal Server"
             })
+        }
+    }
+
+    async turnOnFindJob(req, res, next) {
+        try {
+            const freelancer = await freelancerService.getFreelancerByUserId(req.userId);
+
+            await freelancerService.updateStatus(freelancer.id, true);
+            res.status(200).json({
+                success: true,
+                message: 'Turned On'
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async turnOffFindJob(req, res, next) {
+        try {
+            const freelancer = await freelancerService.getFreelancerByUserId(req.userId);
+
+            await freelancerService.updateStatus(freelancer.id, false);
+            res.status(200).json({
+                success: true,
+                message: 'Turned Off'
+            });
+        } catch (error) {
+            next(error);
         }
     }
 
@@ -131,6 +167,47 @@ class FreelancerController {
                 success: false,
                 message: "Error Internal Server"
             })
+        }
+    }
+
+    async getTopFreelancers(req, res, next) {
+        try {
+            let freelancers = await freelancerService.getTopFreelancers();
+            const unconfirmedEmailAccount = await accountService.getUnconfirmedEmailAccount();
+            const uceaIds = unconfirmedEmailAccount.map((account) => account.user.toString());
+
+            for (let item in freelancers) {
+                console.log(freelancers[item].user);
+                const userId = freelancers[item].user._id.toString();
+
+                if (uceaIds.includes(userId)) {
+                    freelancers[item] = null;
+                }
+            }
+
+            freelancers = freelancers.filter(f => f !== null);
+
+            res.status(200).json({
+                success: true,
+                freelancers
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getSingle(req, res, next) {
+        try {
+            const freelancer = await freelancerService.getByIdAndLean(req.params.id);
+            const userSkills = await userSkillService.getUKByUserAndLean(freelancer.user._id);
+            freelancer['userSkills'] = userSkills;
+            
+            res.status(200).json({
+                success: true,
+                freelancer
+            });
+        } catch (error) {
+            next(error);
         }
     }
 }

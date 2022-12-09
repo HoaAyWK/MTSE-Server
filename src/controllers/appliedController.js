@@ -6,6 +6,7 @@ const freelancerService = require('../services/freelancerService')
 const employerService = require('../services/employerService')
 const { ROLES } = require('../constants/constants'); 
 const { calTotalPages } = require('../utils/page');
+const pick = require('../utils/pick');
 
 class AppliedController{
     async addApply(req, res){
@@ -45,6 +46,15 @@ class AppliedController{
                     success: false,
                     message: "Job is Unavailable"
                 })
+            }
+
+            const existingApply = await appliedService.getAppliedByFreelancerAndJob(freelancer.id, job.id);
+
+            if (existingApply) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'You already apply this job'
+                });
             }
 
             const newApply = await appliedService.createApplied(req.body)
@@ -254,6 +264,44 @@ class AppliedController{
                 result: -1,
                 message: "Internal Error Server"
             })
+        }
+    }
+
+    async getAppliedsByFreelancer(req, res, next) {
+        try {
+            let filter = pick(req.query, ['firstName', 'lastName']);
+            const options = pick(req.query, ['sortBy']);
+            const { limit, page } = req.query;
+            
+            const freelancer = await freelancerService.getFreelancerByUserId(req.userId);
+
+            filter['freelancer'] = freelancer.id;
+
+            const applies = await appliedService.queryApplies(filter, options);
+
+            const totalPage = Math.ceil(applies.length / limit);
+
+            const skip = limit * (page - 1);
+            const take = skip + limit;
+
+            let data = [];
+
+            if (applies.length < limit) {
+                data = applies;
+            } else {
+                data = applies.slice(skip, take);
+            }
+
+            res.status(200).json({
+                success: true,
+                applies: data,
+                totalPage,
+                totalItem: applies.length,
+                limit,
+                page
+            });
+        } catch (error) {
+            next(error);
         }
     }
 }

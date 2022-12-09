@@ -39,7 +39,7 @@ class JobCategoryService {
 
 
     async getCategoryJobsByCategory(categoryId) {
-        return await CategoryJob.find({ category: categoryId });
+        return await CategoryJob.find({ category: categoryId }).lean();
     }
 
 
@@ -80,6 +80,11 @@ class JobCategoryService {
         }
 
         await categoryJob.remove();
+    }
+
+
+    async getCategoryJobsFromJobId(jobId) {
+        return await CategoryJob.find({ job: jobId }).lean().populate('category');
     }
 }
 

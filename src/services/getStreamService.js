@@ -1,4 +1,5 @@
 const { connect } = require('getstream');
+const { StreamChat} = require('stream-chat')
 
 const ApiError = require('../utils/ApiError');
 
@@ -13,6 +14,15 @@ class GetStreamSerivce {
             const streamToken = serverClient.createUserToken(userId);
 
             return streamToken;
+        } catch (error) {
+            throw new ApiError(500, error.message);
+        }
+    }
+
+    async updateUserName(userId, name) {
+        try {
+            const clientChat = StreamChat.getInstance(API_KEY);
+            await clientChat.upsertUser({ id: userId, name });
         } catch (error) {
             throw new ApiError(500, error.message);
         }

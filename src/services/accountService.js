@@ -53,6 +53,11 @@ class AccountService{
     
         await transporter.sendMail(message);
     }
+
+
+    async getUnconfirmedEmailAccount() {
+        return Account.find({ emailConfirmed: false }).lean();
+    }
 }
 
 module.exports = new AccountService

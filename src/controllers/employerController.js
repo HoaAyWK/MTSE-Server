@@ -3,6 +3,7 @@ const userService = require('../services/userService')
 const accountService = require('../services/accountService')
 const ApiError = require('../utils/ApiError')
 const { ROLES, MESSAGE_ERRORS } = require('../constants/constants')
+const userSkillService = require('../services/userSkillService')
 
 class EmployerController{
     async registerEmployer(req, res){
@@ -106,9 +107,10 @@ class EmployerController{
                 })
             }
             
-            const employer = await employerService.getEmployerById(id)
-            const user = await userService.getUserById(employer.user)
-            employer.user = user
+            const employer = await employerService.getEmployerById(id);
+            const userSkills = await userSkillService.getUKByUserAndLean(employer.user._id);
+
+            employer['userSkills'] = userSkills;
 
             return res.status(200).json({
                 employer

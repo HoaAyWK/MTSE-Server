@@ -5,6 +5,7 @@ const freelancerService = require('../services/freelancerService')
 const employerService = require('../services/employerService')
 const categoryService = require('../services/categoryService')
 const skillService = require('../services/skillService')
+const accountService = require('../services/accountService');
 const pick = require('../utils/pick');
 
 class SearchController{
@@ -249,9 +250,9 @@ class SearchController{
             const filter = pick(req.query, ['name', 'price']);
             const options = pick(req.query, ['sortBy']);
             const { categories: filterByCategories, company, limit, page } = req.query;
-            const jobs = await jobService.queryJobs(filter, options);
+            let jobs = await jobService.queryJobs(filter, options);
             const jobIds = jobs.map((item) => item._id);
-
+            
             if (company) {
                 const jobsByEmployer = await jobService.getJobsByEmployerName(company);
 
@@ -261,6 +262,29 @@ class SearchController{
                     }
                 }
             }
+
+            if (filterByCategories) {
+                const categories = filterByCategories.split(',');
+                let categoryJobs = [];
+
+                for (let cate of categories) {
+                    const cj = await categoryJobService.getCategoryJobsByCategory(cate);
+                    categoryJobs = categoryJobs.concat(cj);
+                }
+
+                const jobIds = categoryJobs.map((cj) => cj.job.toString());
+
+                for (let job in jobs) {
+                    if (!jobIds.includes(jobs[job]._id.toString())) {
+                        jobs[job] = null;
+                    }
+                }
+
+                jobs = jobs.filter((j) => (j !== null));
+                console.log(jobs);
+            }
+
+
 
             const totalPage = Math.ceil(jobs.length / limit);
 
@@ -296,10 +320,25 @@ class SearchController{
 
     async searchFreelancers(req, res, next) {
         try {
-            const filter = pick(req.query, ['firstName', 'lastName']);
+            let filter = pick(req.query, ['firstName', 'lastName']);
             const options = pick(req.query, ['sortBy']);
             const { limit, page } = req.query;
-            const freelancers = await freelancerService.queryFreelancers(filter, options);
+
+            // status: true = find job, false = dive
+            filter['status'] = true;
+
+            let freelancers = await freelancerService.queryFreelancers(filter, options);
+
+            const unconfirmedEmailAccount = await accountService.getUnconfirmedEmailAccount();
+            const uceaIds = unconfirmedEmailAccount.map((account) => account.user.toString());
+
+            for (let item in freelancers) {
+                if (uceaIds.includes(freelancers[item].user._id.toString())) {
+                    freelancers[item] = null;
+                }
+            }
+
+            freelancers = freelancers.filter(f => f !== null);
 
             const totalPage = Math.ceil(freelancers.length / limit);
 
@@ -331,10 +370,21 @@ class SearchController{
             const filter = pick(req.query, ['companyName']);
             const options = pick(req.query, ['sortBy']);
             const { limit, page } = req.query;
-            const employers = await employerService.queryEmployers(filter, options);
+            let employers = await employerService.queryEmployers(filter, options);
+            const unconfirmedEmailAccount = await accountService.getUnconfirmedEmailAccount();
+            const uceaIds = unconfirmedEmailAccount.map((account) => account.user.toString());
 
+            
+            
+            for (let item in employers) {
+                if (uceaIds.includes(employers[item].user._id.toString())) {
+                    employers[item] = null
+                }
+            }
+            
+            employers = employers.filter(e => e !== null);
+            
             const totalPage = Math.ceil(employers.length / limit);
-
             const skip = limit * (page - 1);
             const take = skip + limit;
 
@@ -346,12 +396,14 @@ class SearchController{
                 data = employers.slice(skip, take);
             }
 
+            
+
             res.status(200).json({
                 data,
                 limit,
                 page,
                 totalPage,
-                totalItem: employers.length
+                totalItem: employers.length,
             });
         } catch (error) {
             next(error);

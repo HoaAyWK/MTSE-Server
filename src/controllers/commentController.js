@@ -1,6 +1,10 @@
 const commentService = require('../services/commentService')
 
 const userService = require('../services/userService')
+const accountService = require('../services/accountService');
+const employerService = require('../services/employerService');
+const freelancerService = require('../services/freelancerService');
+const { ROLES } = require('../constants/constants');
 
 
 class CommentController{
@@ -39,9 +43,10 @@ class CommentController{
 
             const newStar = ((receiver.stars * numComments) + req.body.star) / (numComments + 1)
 
+
             const newComment = await commentService.createComment(req.body)
 
-            await userService.changeStar(req.body.receiver, newStar)
+            await userService.changeStar(req.body.receiver, newStar, numComments + 1)
 
             return res.status(200).json({
                 success: true,
@@ -199,6 +204,77 @@ class CommentController{
         }
     }
 
+    async getCommentedForReceiver(req, res, next) {
+        try {    
+            let comments = await commentService.getCommentsByReceiver(req.query.receiver);
+            const receiAccount = await accountService.getAccountByUserId(req.query.receiver);
+            
+            if (receiAccount.role === ROLES.FREELANCER) {
+                for (let com in comments) {
+                    const employer = await employerService.getByUserIdAndLean(comments[com].sender._id);
+                    if (!employer) {
+                        comments[com] = null;
+                    } else {
+                        comments[com].sender['employer'] = employer;
+                    }
+                }
+            } else if (receiAccount.role === ROLES.EMPLOYER) {
+                for (let com in comments) {
+                    const freelancer = await freelancerService.getByUserIdAndLean(comments[com].sender._id);
+                    if (!freelancer) {
+                        comments[com] = null;
+                    } else {
+                        comments[com].sender['freelancer'] = freelancer;
+                    }
+                }
+            }
+
+            comments = comments.filter(c => c !== null);
+
+            res.status(200).json({
+                success: true,
+                comments
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getCommentsForSender(req, res, next) {
+        try {
+            let comments = await commentService.getCommentsBySender(req.query.sender);
+            const senderAccount = await accountService.getAccountByUserId(req.query.sender);
+
+            if (senderAccount.role === ROLES.FREELANCER) {
+                for (let com in comments) {
+                    const employer = await employerService.getByUserIdAndLean(comments[com].receiver._id);
+                    if (!employer) {
+                        comments[com] = null;
+                    } else {
+                        comments[com].employer = employer;
+                    }
+                }
+            } else if (senderAccount.role === ROLES.EMPLOYER) {
+                for (let com in comments) {
+                    const freelancer = await freelancerService.getByIdAndLean(comments[com].receiver._id);   
+                    if (!freelancer) {
+                        comments[com] = null;
+                    } else {
+                        comments[com].freelancer = freelancer;
+                    }
+                }
+            }
+
+            comments = comments.filter(c => c !== null);
+
+            res.status(200).json({
+                success: true,
+                comments
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new CommentController

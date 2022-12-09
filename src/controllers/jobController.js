@@ -132,8 +132,6 @@ class JobController{
             }
 
             const job = await jobService.getJobById(req.query.id)
-            const employer = await employerService.getEmployerById(job.employer)
-            job.employer = employer
             const categories = await categoryJobService.getCategoriesByJob(job.id)
             for (var i=0; i<categories.length; i++){
                 var category = await categoryService.getCategoryById(categories[i].category)
@@ -334,7 +332,7 @@ class JobController{
     }
 
 
-    async getMyJobs(req, res, next) {
+    async getAllMyJobs(req, res, next) {
         try {
             const employer = await employerService.getEmployerByUserId(req.userId);
 
@@ -342,14 +340,41 @@ class JobController{
                 throw new ApiError(403, 'You are not the owner of these jobs');
             }
 
-            const jobs = await jobService.getJobsByEmployer(employer.id);
+            const availableJobs = await jobService.getEmployerAvailableJobs(employer.id);
+            const expiredJobs = await jobService.getEmployerExpiredJobs(employer.id);
+            const countAppliesByJobs = await appliedService.countAppliesByJobs();
+            const appliesPerJob = {};
+            for (let job of countAppliesByJobs) {
+                appliesPerJob[job._id] = job.count
+            };
 
             res.status(200).json({
                 success: true,
-                jobs
+                availableJobs,
+                expiredJobs,
+                appliesPerJob
             });
         } catch (error) {
             next(error)
+        }
+    }
+
+    async getJobWithApplies(req, res, next) {
+        try {
+            const job = await jobService.getJobById(req.params.id);
+            if (!job) {
+                throw new ApiError(400, 'Job not found');
+            }
+            const applies = await appliedService.getAppliesByJobId(job._id);
+            const categories = await categoryJobService.getCategoryJobsFromJobId(job._id);
+            res.status(200).json({
+                success: true,
+                job,
+                applies,
+                categories
+            });
+        } catch (error) {
+            next(error);
         }
     }
 }

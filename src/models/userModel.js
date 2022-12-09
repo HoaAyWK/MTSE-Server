@@ -27,6 +27,10 @@ const UserSchema = new mongoose.Schema({
         required: true,
         default: 0
     },
+    numRating: {
+        type: Number,
+        default: 0
+    },
     vip: {
         type: Number,
         requried: true,

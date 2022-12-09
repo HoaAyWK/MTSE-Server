@@ -30,6 +30,10 @@ const freelancerSchema = new mongoose.Schema({
     },
     doneJobs: {
         type: String
+    },
+    status: {
+        type: Boolean,
+        default: false
     }
 });
 

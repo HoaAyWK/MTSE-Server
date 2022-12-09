@@ -14,7 +14,7 @@ class EmployerService{
     }
 
     async getEmployerById(id){
-        return await Employer.findById(id)
+        return await Employer.findById(id).lean().populate('user');
     }
 
     async getEmployers() {
@@ -59,6 +59,14 @@ class EmployerService{
         }
 
         return  await Employer.find(filter).sort(sort).lean().populate('user');
+    }
+
+    async getByUserIdAndLean(userId) {
+        return await Employer.findOne({ user: userId }).lean().populate({ path: 'user', select: '_id image'});
+    }
+
+    async getByIdAndLean(employerId) {
+        return await Employer.findById(employerId).lean().populate('user');
     }
 }
 

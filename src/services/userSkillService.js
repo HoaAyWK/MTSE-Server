@@ -58,6 +58,12 @@ class UserSkillService {
 
         await userSkill.remove();
     }
+
+    async getUKByUserAndLean(userId) {
+        return await UserSkill.find({ user: userId })
+            .lean()
+            .populate('skill');
+    }
 }
 
 module.exports = new UserSkillService;

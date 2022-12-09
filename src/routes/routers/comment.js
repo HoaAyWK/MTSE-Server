@@ -8,4 +8,7 @@ router.get('/show', commentController.getCommentsOfObject)
 router.get('/my', jwtFilter.verifyToken, commentController.getMyComments)
 router.put('/edit', jwtFilter.verifyToken, commentController.editComment)
 
+router.get('/user', commentController.getCommentedForReceiver);
+router.get('/sender', commentController.getCommentsForSender);
+
 module.exports = router

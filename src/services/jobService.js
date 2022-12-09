@@ -45,7 +45,7 @@ class JobService {
     }
 
     async getJobById(id) {
-        return await Job.findById(id);
+        return await Job.findById(id).lean().populate({ path: 'employer', populate: { path: 'user' }});
     }
 
     /* async getJobsByEmployer(employerId) {
@@ -210,7 +210,7 @@ class JobService {
             sort = "createdAt";
         }
 
-        return  await Job.find(filter).sort(sort).lean().populate('employer');
+        return  await Job.find(filter).sort(sort).lean().populate({ path: 'employer', populate: { path: 'user' }});
     }
 
     async getJobsByEmployerName(name) {
@@ -236,6 +236,16 @@ class JobService {
                 }
             }
         ]);
+    }
+
+    async getEmployerAvailableJobs(employerId) {
+        const toDay = new Date();
+        return await Job.find({ employer: employerId, expireDate: { $gt: toDay } }).lean();
+    }
+
+    async getEmployerExpiredJobs(employerId) {
+        const toDay = new Date();
+        return await Job.find({ employer: employerId, expireDate: { $lte: toDay } }).lean();
     }
 }
 

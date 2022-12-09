@@ -9,5 +9,6 @@ router.get('/myJob/:job', jwtFilter.verifyToken, appliedController.getAppliedByJ
 router.get('/check/:job', jwtFilter.verifyToken, appliedController.checkApplied)
 router.get('/admin/:job', jwtFilter.verifyToken, appliedController.getAppliedsByJobForAdmin);
 router.get('/jobs/:job', jwtFilter.verifyToken, appliedController.getAppliedsByJob);
+router.get('/my', jwtFilter.verifyToken, appliedController.getAppliedsByFreelancer);
 
 module.exports = router

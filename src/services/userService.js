@@ -26,8 +26,8 @@ class UserService{
         return user
     }
 
-    async changeStar(userId, stars){
-        await User.findByIdAndUpdate(userId, {stars})
+    async changeStar(userId, stars, numRating){
+        await User.findByIdAndUpdate(userId, { $set: { stars, numRating }})
     }
 
 

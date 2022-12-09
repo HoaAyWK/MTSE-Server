@@ -83,7 +83,7 @@ io.on('connection', async (socket) => {
         console.log('freelancer apply job');
 
         const message = { freelancerId, username, avatar, jobId, jobName, applyDate: new Date(), isRead: false, to };
-        console.log(to);
+        console.log(message);
         socket.to(to).emit('apply job', message);
 
         messageStore.saveMessage(message);

@@ -19,11 +19,18 @@ class CommentService {
     }
 
     async getCommentsBySender(senderId) {
-        return await Comment.find({ sender: senderId });
+        return await Comment.find({ sender: senderId })
+            .sort('-createdAt')
+            .lean()
+            .populate({ path: 'receiver', select: '_id email phone stars numRating image' });
     }
 
     async getCommentsByReceiver(receiverId) {
-        return await Comment.find({ receiver: receiverId });
+        return await Comment
+            .find({ receiver: receiverId })
+            .sort('-createdAt')
+            .lean()
+            .populate({ path: 'sender', select: '_id email phone stars numRating image' });
     }
 
     async createComment(comment) {

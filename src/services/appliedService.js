@@ -57,8 +57,22 @@ class AppliedService {
         return await Applied.findOne({ freelancer: freelancerId, job: jobId });
     }
 
-    async getAppliedByFreelancer(freelancerId) {
-        return await Applied.find({ freelancer: freelancerId });
+    async queryApplies(fitler, options) {
+
+        return await Applied.find(fitler)
+            .sort('-appliedAt')
+            .lean()
+            .populate({
+                path: 'job',
+                populate: {
+                    path: 'employer',
+                    select: 'companyName',
+                    populate: {
+                        path: 'user',
+                        select: '_id email image'
+                    }
+                }
+            });
     }
 
     async updateApplied(id, updateBody) {
@@ -83,6 +97,26 @@ class AppliedService {
 
     async getAppliedByJobAndFreelancer(job, freelancer){
         return await Applied.findOne({job, freelancer})
+    }
+
+    async countAppliesByJobs() {
+        return await Applied.aggregate([
+            {
+                $group: {
+                    _id: '$job',
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+    }
+
+    async getAppliesByJobId(jobId) {
+        return await Applied
+            .find({ job: jobId })
+            .sort('-appliedAt')
+            .lean()
+            .populate({ path: 'job', select: '_id employer' })
+            .populate({ path: 'freelancer', populate: { path: 'user', select: '_id email phone image' }});
     }
 }
 
