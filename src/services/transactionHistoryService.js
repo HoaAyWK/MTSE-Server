@@ -169,6 +169,10 @@ class TransactionHistoryService {
 
         return daysObj;
     }
+
+    async getTHByUserId(userId) {
+        return await TransactionHistory.find({ user: userId}).lean().populate('package');
+    }
 }
 
 

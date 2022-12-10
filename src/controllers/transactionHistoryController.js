@@ -26,6 +26,19 @@ class TransactionHistoryController {
             next(error);
         }
     }
+
+    async getMyTransaction(req, res, next) {
+        try {
+            const transactions = await transactionHistoryService.getTHByUserId(req.userId);
+
+            res.status(200).json({
+                success: true,
+                transactions
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new TransactionHistoryController;

@@ -1,5 +1,6 @@
 const Account = require('../models/accountModel')
 const argon2 = require('argon2')
+const nodemailer = require('nodemailer')
 
 class AccountService{
     async saveAccount(account){
@@ -11,7 +12,7 @@ class AccountService{
 
         newAccount.save()
 
-        return account
+        return newAccount;
     }
 
     async checkPassword(account, password){
@@ -57,6 +58,11 @@ class AccountService{
 
     async getUnconfirmedEmailAccount() {
         return Account.find({ emailConfirmed: false }).lean();
+    }
+
+
+    async updateAccount(accountId, data) {
+        return Account.findByIdAndUpdate(accountId, { $set: data });
     }
 }
 

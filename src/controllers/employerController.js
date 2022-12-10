@@ -4,6 +4,8 @@ const accountService = require('../services/accountService')
 const ApiError = require('../utils/ApiError')
 const { ROLES, MESSAGE_ERRORS } = require('../constants/constants')
 const userSkillService = require('../services/userSkillService')
+const moment = require('moment');
+const jwt = require('jsonwebtoken');
 
 class EmployerController{
     async registerEmployer(req, res){
@@ -22,8 +24,37 @@ class EmployerController{
 
             req.body.user = newUser.id
 
-            await accountService.saveAccount(req.body)
             await employerService.saveEmployer(req.body)
+
+            req.body.role = ROLES.EMPLOYER;
+
+            const account = await accountService.saveAccount(req.body);
+
+            const payload = {
+                sub: newUser.id,
+                accountId: account._id,
+                iat: moment().unix(),
+                expires: moment().add(30, 'minutes').toDate()
+            };
+
+            const confirmEmailToken = jwt.sign(payload, process.env.JWT_SECRET);
+
+            await accountService.updateAccount(account._id, { confirmEmailToken });
+
+            const url = `${process.env.CLIENT_URL}email/confirm/${confirmEmailToken}`;
+            const content =  `
+                <div>
+                    <h3>If you have not requested this email, then ignore it</h3>
+                    <h3>Click the link bellow to confirm your email</h3>
+                    <a href="${url}">Confirm Email</a>
+                </div>
+            `;
+
+            accountService.sendEmail({
+                email: req.body.email,
+                subject: 'Confirm your email',
+                message: content
+            });
 
             return res.status(200).json({
                 success: true,

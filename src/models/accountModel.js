@@ -22,7 +22,9 @@ const accountSchema = new mongoose.Schema({
         type: String,
         required: true,
         default: ROLES.FREELANCER
-    }
+    },
+    confirmEmailToken: String,
+    resetPasswordToken: String,
 }, { timestamps: true });
 
 accountSchema.plugin(toJSON);

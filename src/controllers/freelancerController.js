@@ -7,6 +7,8 @@ const commentService = require('../services/commentService')
 const ApiError = require('../utils/ApiError')
 const { ROLES, MESSAGE_ERRORS } = require('../constants/constants')
 const getStreamService = require('../services/getStreamService')
+const moment = require('moment');
+const jwt = require('jsonwebtoken');
 
 class FreelancerController {
     async registerFreelancer(req, res) {
@@ -22,15 +24,44 @@ class FreelancerController {
 
             const newUser = await userService.saveUser(req.body)
             req.body.user = newUser.id
-            await accountService.saveAccount(req.body)
+            const account = await accountService.saveAccount(req.body);
+
+            const payload = {
+                sub: newUser.id,
+                accountId: account._id,
+                iat: moment().unix(),
+                expires: moment().add(30, 'minutes').toDate()
+            };
+
+            const confirmEmailToken = jwt.sign(payload, process.env.JWT_SECRET);
+
+            await accountService.updateAccount(account._id, { confirmEmailToken });
+
             await freelancerService.saveFreelancer(req.body)
+
+            const url = `${process.env.CLIENT_URL}email/confirm/${confirmEmailToken}`;
+            const content =  `
+                <div>
+                    <h3>If you have not requested this email, then ignore it</h3>
+                    <h3>Click the link bellow to confirm your email</h3>
+                    <a href="${url}">Confirm Email</a>
+                </div>
+            `;
+
+            accountService.sendEmail({
+                email: req.body.email,
+                subject: 'Confirm your email',
+                message: content
+            });
 
             return res.status(200).json({
                 success: true,
-                message: "Register Freelancer Successfully"
+                message: "Register Freelancer Successfully",
+                confirmEmailToken
             })
         }
         catch (error) {
+            console.log(error);
             return res.status(500).json({
                 success: false,
                 message: "Error Internal Server"
