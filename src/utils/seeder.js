@@ -1,7 +1,6 @@
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 const argon2 = require('argon2');
-
 const { User, Account, Skill, Category, Package, Employer, Freelancer, Job, Applied, TransactionHistory, CategoryJob, UserSkill } = require('../models');
 const { connectDatabase } = require('../config/database');
 const { ADMIN, ROLES, EMPLOYER, FREELANCER, NO_CONFIRMED_EMAIL_USER, JOB_ID, CONFIRMED_EMAIL_USER } = require('../constants/constants');
@@ -145,8 +144,6 @@ const seedCateJobs = async () => {
 
 const seedUsers = async () => {
     try {
-        
-
         await Freelancer.deleteMany();
         console.log('Deleted freelances');
         await Employer.deleteMany();
@@ -229,6 +226,7 @@ Enim non velit do excepteur ea incididunt enim eu duis. Deserunt sint deserunt l
         };
 
         const employerUser = await User.create(employer);
+        
 
         const employerUser2 = await User.create({
             email: 'employer001@gmail.com',
@@ -245,6 +243,8 @@ Exercitation minim labore mollit qui ex pariatur tempor esse amet non culpa anim
             `,
             image: 'https://firebasestorage.googleapis.com/v0/b/mtse-ba6db.appspot.com/o/files%2Favatars%2Fgraphic.jpg?alt=media&token=c85ca9ad-64f8-4596-a3c6-3c38454c421c'
         })
+
+        
 
         console.log("Created employer user");
 
@@ -282,9 +282,7 @@ Exercitation minim labore mollit qui ex pariatur tempor esse amet non culpa anim
             companyType: "Production",
             foundingDate: new Date()
         });
-
         
-
         console.log("Created employer");
 
         const freelancer = {
@@ -314,6 +312,7 @@ Exercitation minim labore mollit qui ex pariatur tempor esse amet non culpa anim
             `,
             image: 'https://firebasestorage.googleapis.com/v0/b/mtse-ba6db.appspot.com/o/files%2Favatars%2F38d13a3f-5f51-4570-981d-8e839d1b75d7?alt=media&token=25fa829a-1bb1-42a3-88ad-8a9bafa4b9bd'
         });
+
 
         console.log("Created freelancer user");
 

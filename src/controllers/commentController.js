@@ -5,6 +5,7 @@ const accountService = require('../services/accountService');
 const employerService = require('../services/employerService');
 const freelancerService = require('../services/freelancerService');
 const { ROLES } = require('../constants/constants');
+const ApiError = require('../utils/ApiError');
 
 
 class CommentController{
@@ -245,6 +246,10 @@ class CommentController{
             let comments = await commentService.getCommentsBySender(req.query.sender);
             const senderAccount = await accountService.getAccountByUserId(req.query.sender);
 
+            if (!senderAccount) {
+                throw new ApiError(400, 'Account not found');
+            }
+
             if (senderAccount.role === ROLES.FREELANCER) {
                 for (let com in comments) {
                     const employer = await employerService.getByUserIdAndLean(comments[com].receiver._id);
@@ -256,7 +261,7 @@ class CommentController{
                 }
             } else if (senderAccount.role === ROLES.EMPLOYER) {
                 for (let com in comments) {
-                    const freelancer = await freelancerService.getByIdAndLean(comments[com].receiver._id);   
+                    const freelancer = await freelancerService.getByUserIdAndLean(comments[com].receiver._id);   
                     if (!freelancer) {
                         comments[com] = null;
                     } else {

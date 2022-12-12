@@ -74,6 +74,10 @@ class UserController{
             }
 
             await userService.updateUser(req.userId, req.body)
+            res.status(200).json({
+                success: true,
+                message: 'Updated Profile'
+            })
         } catch (error) {
             return res.status(500).json({
                 success: false,
