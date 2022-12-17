@@ -3,7 +3,7 @@ const cors = require('cors');
 
 const route = require('./routes/index');
 const { checkoutController } = require('./controllers');
-const errorHandlersMiddleware = require('./middlewares/errorHandlers');
+const errorHandlersMiddleware = require('./middleware/errorHandlers');
 
 const app = express();
 
