@@ -15,4 +15,6 @@ router.get('/my', jwtFilter.verifyToken, jobController.getAllMyJobs);
 
 router.get('/single/:id', jobController.getJobWithApplies);
 
+router.get('/latest', jobController.getLatestAvailableJobs);
+
 module.exports = router

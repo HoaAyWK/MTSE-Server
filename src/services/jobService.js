@@ -28,6 +28,12 @@ class JobService {
 
     }
 
+    async getLatestAvailableJobs() {
+        return await Job.find({ expireDate: { $gt: new Date() }})
+            .populate({ path: 'employer', populate: { path: 'user' }})
+            .sort('-createdAt');
+    }
+
     async getJobsByInfo(info){
         return await Job.find({name: {$regex: info, $options: "i"}, description: {$regex: info, $options: "i"}})
     }

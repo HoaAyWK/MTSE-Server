@@ -247,9 +247,10 @@ class SearchController{
 
     async searchJobs(req, res, next) {
         try { 
-            const filter = pick(req.query, ['name', 'price']);
+            let filter = pick(req.query, ['name', 'price']);
             const options = pick(req.query, ['sortBy']);
             const { categories: filterByCategories, company, limit, page } = req.query;
+            filter.expireDate = { $gt: new Date() };
             let jobs = await jobService.queryJobs(filter, options);
             const jobIds = jobs.map((item) => item._id);
             

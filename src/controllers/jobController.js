@@ -190,6 +190,31 @@ class JobController{
         }
     }
 
+    async getLatestAvailableJobs(req, res, next) {
+        try {
+            const jobs = await jobService.getLatestAvailableJobs();
+            let categoriesJobs = [];
+
+            for (let i = 0; i < jobs.length; i++) {
+                const categories = await categoryJobService.getCategoriesByJob(jobs[i].id)
+                let temp = []
+                for (let j = 0; j < categories.length; j++) {
+                    const category = await categoryService.getCategoryById(categories[j].category)
+                    temp.push(category)
+                }
+                categoriesJobs.push(temp)
+            }
+
+            res.status(200).json({
+                success: true,
+                categories: categoriesJobs,
+                jobs
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async changeStatus(req, res){
         try{
             if (!req.userId){
